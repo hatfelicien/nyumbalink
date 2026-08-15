@@ -10,11 +10,14 @@ export interface User {
   city?: string
   nationalId?: string
   status: 'active' | 'suspended' | 'pending'
+  /** Owner has proven identity (national ID / property document) to an admin. Guests and admins leave this unset. */
+  verified?: boolean
   createdAt: string
 }
 
 export type PropertyType = 'apartment' | 'bungalow' | 'studio' | 'villa' | 'shared room'
-export type PropertyStatus = 'available' | 'reserved' | 'rented'
+export type ListingPurpose = 'rent' | 'sale'
+export type PropertyStatus = 'available' | 'reserved' | 'rented' | 'sold'
 export type ListingStatus = 'draft' | 'pending' | 'published' | 'flagged'
 
 export type Amenity =
@@ -37,12 +40,20 @@ export interface Property {
   description: string
   price: number
   type: PropertyType
+  /** Whether this listing is for rent (monthly `price`) or for sale (one-off `price`). */
+  purpose: ListingPurpose
+  /** Whether the owner is open to negotiating `price`. */
+  negotiable: boolean
+  /** Refundable deposit in RWF, collected before move-in. Rent listings only; 0 for sale listings. */
+  cautionMoney: number
   bedrooms: number
   bathrooms: number
   sizeSqm: number
   furnished: boolean
   amenities: Amenity[]
   status: PropertyStatus
+  /** ISO date. Set when `status` is not 'available', to tell guests when it's expected to free up again. */
+  availableFrom?: string
   listingStatus: ListingStatus
   images: string[]
   address: string
@@ -97,8 +108,43 @@ export interface FilterState {
   bedrooms: number | null
   bathrooms: number | null
   type: PropertyType | null
+  purpose: ListingPurpose | null
   furnished: boolean | null
   amenities: Amenity[]
   status: PropertyStatus | null
   sort: 'newest' | 'price-asc' | 'price-desc' | 'rating'
+}
+
+export interface ChatThread {
+  id: string
+  propertyId: string
+  guestId: string
+  ownerId: string
+  createdAt: string
+}
+
+export interface ChatMessage {
+  id: string
+  threadId: string
+  senderId: string
+  text: string
+  read: boolean
+  createdAt: string
+}
+
+export type PaymentMethod = 'mtn_momo' | 'airtel_money'
+export type PaymentPurpose = 'caution' | 'reservation'
+export type PaymentStatus = 'pending' | 'success' | 'failed'
+
+export interface Payment {
+  id: string
+  propertyId: string
+  guestId: string
+  method: PaymentMethod
+  phone: string
+  amount: number
+  purpose: PaymentPurpose
+  status: PaymentStatus
+  reference: string
+  createdAt: string
 }

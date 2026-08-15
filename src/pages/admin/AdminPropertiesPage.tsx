@@ -80,7 +80,23 @@ export function AdminPropertiesPage() {
         </div>
       ),
     },
-    { key: 'price', header: 'Rent', sortable: true, sortValue: (row) => row.price, render: (row) => formatRwf(row.price) },
+    {
+      key: 'purpose',
+      header: 'Purpose',
+      render: (row) => <Badge variant="brand">{row.purpose === 'sale' ? 'For sale' : 'For rent'}</Badge>,
+    },
+    {
+      key: 'price',
+      header: 'Price',
+      sortable: true,
+      sortValue: (row) => row.price,
+      render: (row) => (
+        <>
+          {formatRwf(row.price)}
+          {row.purpose === 'rent' && <span className="text-slate-500">/mo</span>}
+        </>
+      ),
+    },
     {
       key: 'listingStatus',
       header: 'Listing',

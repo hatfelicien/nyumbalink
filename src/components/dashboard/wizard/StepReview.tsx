@@ -16,11 +16,22 @@ export function StepReview({ form }: { form: UseFormReturn<WizardValues> }) {
         <div className="p-5">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <h3 className="text-lg font-semibold text-navy-900 dark:text-white">{values.title || 'Untitled listing'}</h3>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-lg font-semibold text-navy-900 dark:text-white">{values.title || 'Untitled listing'}</h3>
+                <Badge variant="brand">{values.purpose === 'sale' ? 'For sale' : 'For rent'}</Badge>
+                {values.negotiable && <Badge variant="success">Negotiable</Badge>}
+              </div>
               <p className="text-sm text-slate-500">{values.address || 'No address set'}</p>
             </div>
-            <p className="text-xl font-semibold text-navy-900 dark:text-white">{formatRwf(values.price || 0)}/mo</p>
+            <p className="text-xl font-semibold text-navy-900 dark:text-white">
+              {formatRwf(values.price || 0)}
+              {values.purpose === 'rent' && '/mo'}
+            </p>
           </div>
+
+          {values.purpose === 'rent' && values.cautionMoney > 0 && (
+            <p className="mt-2 text-sm text-slate-500">Caution money: {formatRwf(values.cautionMoney)}</p>
+          )}
 
           <p className="mt-3 text-sm leading-relaxed text-slate-500">{values.description}</p>
 

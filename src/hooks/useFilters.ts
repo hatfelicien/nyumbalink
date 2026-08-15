@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import type { Amenity, FilterState, PropertyStatus, PropertyType } from '../types'
+import type { Amenity, FilterState, ListingPurpose, PropertyStatus, PropertyType } from '../types'
 import { PRICE_MAX, PRICE_MIN } from '../utils/constants'
 
 const DEFAULT_FILTERS: FilterState = {
@@ -10,6 +10,7 @@ const DEFAULT_FILTERS: FilterState = {
   bedrooms: null,
   bathrooms: null,
   type: null,
+  purpose: null,
   furnished: null,
   amenities: [],
   status: null,
@@ -28,6 +29,7 @@ export function useFilters() {
       bedrooms: searchParams.has('bedrooms') ? Number(searchParams.get('bedrooms')) : null,
       bathrooms: searchParams.has('bathrooms') ? Number(searchParams.get('bathrooms')) : null,
       type: (searchParams.get('type') as PropertyType | null) ?? null,
+      purpose: (searchParams.get('purpose') as ListingPurpose | null) ?? null,
       furnished: searchParams.has('furnished') ? searchParams.get('furnished') === 'true' : null,
       amenities: amenitiesParam ? (amenitiesParam.split(',') as Amenity[]) : [],
       status: (searchParams.get('status') as PropertyStatus | null) ?? null,
@@ -35,21 +37,45 @@ export function useFilters() {
     }
   }, [searchParams])
 
+  function applyFilterEntry<K extends keyof FilterState>(params: URLSearchParams, key: K, value: FilterState[K]) {
+    const isDefault = JSON.stringify(value) === JSON.stringify(DEFAULT_FILTERS[key])
+    const isEmptyArray = Array.isArray(value) && value.length === 0
+    const isNullish = value === null || value === ''
+
+    if (isDefault || isEmptyArray || isNullish) {
+      params.delete(key)
+    } else if (Array.isArray(value)) {
+      params.set(key, value.join(','))
+    } else {
+      params.set(key, String(value))
+    }
+  }
+
   const setFilter = useCallback(
     <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
       setSearchParams(
         (previous) => {
           const next = new URLSearchParams(previous)
-          const isDefault = JSON.stringify(value) === JSON.stringify(DEFAULT_FILTERS[key])
-          const isEmptyArray = Array.isArray(value) && value.length === 0
-          const isNullish = value === null || value === ''
+          applyFilterEntry(next, key, value)
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [setSearchParams],
+  )
 
-          if (isDefault || isEmptyArray || isNullish) {
-            next.delete(key)
-          } else if (Array.isArray(value)) {
-            next.set(key, value.join(','))
-          } else {
-            next.set(key, String(value))
+  // setFilter calls made back-to-back in the same handler each diff against the
+  // pre-click URLSearchParams (react-router's setSearchParams doesn't queue functional
+  // updates the way React state does), so only the last call would survive. Anything
+  // that needs to change more than one filter key at once must go through here instead.
+  const setFilters = useCallback(
+    (patch: Partial<FilterState>) => {
+      setSearchParams(
+        (previous) => {
+          const next = new URLSearchParams(previous)
+          for (const key of Object.keys(patch) as (keyof FilterState)[]) {
+            applyFilterEntry(next, key, patch[key] as FilterState[typeof key])
           }
           return next
         },
@@ -71,5 +97,5 @@ export function useFilters() {
 
   const resetFilters = useCallback(() => setSearchParams(new URLSearchParams(), { replace: true }), [setSearchParams])
 
-  return { filters, setFilter, toggleAmenity, resetFilters, defaultFilters: DEFAULT_FILTERS }
+  return { filters, setFilter, setFilters, toggleAmenity, resetFilters, defaultFilters: DEFAULT_FILTERS }
 }

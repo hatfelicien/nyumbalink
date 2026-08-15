@@ -1,31 +1,90 @@
 import { useState } from 'react'
-import { MessageCircle } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { MessageCircle, MessagesSquare, ShieldCheck, Smartphone } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
+import { useToast } from '../../hooks/useToast'
+import { chatService } from '../../services/chatService'
 import type { Property, User } from '../../types'
 import { Avatar } from '../ui/Avatar'
+import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
-import { buildWhatsAppLink, formatDate } from '../../utils/format'
+import { buildWhatsAppLink, formatDate, formatRwf } from '../../utils/format'
 import { ContactOwnerModal } from './ContactOwnerModal'
+import { MobileMoneyModal } from '../payments/MobileMoneyModal'
 
 export function OwnerCard({ owner, property }: { owner: User; property: Property }) {
+  const { user } = useAuth()
+  const { t } = useLanguage()
+  const { showToast } = useToast()
+  const navigate = useNavigate()
   const [contactOpen, setContactOpen] = useState(false)
+  const [paymentOpen, setPaymentOpen] = useState(false)
+  const [startingChat, setStartingChat] = useState(false)
 
   const whatsAppHref = owner.phone
     ? buildWhatsAppLink(owner.phone, `Hi, I am interested in "${property.title}" on NyumbaLink. Is it still available?`)
     : null
+
+  const paymentPurpose = property.purpose === 'rent' ? 'caution' : 'reservation'
+  const paymentAmount = property.purpose === 'rent' ? property.cautionMoney : Math.round(property.price * 0.01)
+  const canPay = property.purpose === 'rent' ? paymentAmount > 0 : true
+
+  async function handleChat() {
+    if (!user) {
+      showToast('Log in to chat', { description: 'Sign in to message this owner.', variant: 'error' })
+      navigate(`/login?returnTo=${encodeURIComponent(`/listings/${property.id}`)}`)
+      return
+    }
+    if (user.id === owner.id) return
+    setStartingChat(true)
+    const thread = await chatService.getOrCreateThread(property.id, user.id, owner.id)
+    // No setStartingChat(false) here — navigating away unmounts this component, and
+    // batching that reset into the same commit as the route change was found to make
+    // AnimatePresence render the next route stuck in its exit state (see AnimatedOutlet).
+    navigate(`/messages?thread=${thread.id}`)
+  }
 
   return (
     <Card className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Avatar name={owner.name} src={owner.avatar} size="lg" />
         <div>
-          <p className="font-semibold text-navy-900 dark:text-white">{owner.name}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="font-semibold text-navy-900 dark:text-white">{owner.name}</p>
+            {owner.verified && (
+              <Badge variant="brand" className="gap-1">
+                <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+                {t('property.verified')}
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-slate-500">Owner since {formatDate(owner.createdAt)}</p>
         </div>
       </div>
-      <Button onClick={() => setContactOpen(true)} icon={<MessageCircle className="h-4 w-4" />}>
-        Contact owner
+      <Button onClick={handleChat} loading={startingChat} icon={<MessagesSquare className="h-4 w-4" />}>
+        {t('property.chatWithOwner')}
       </Button>
+      <Button variant="secondary" onClick={() => setContactOpen(true)} icon={<MessageCircle className="h-4 w-4" />}>
+        {t('property.sendEnquiry')}
+      </Button>
+      {canPay && (
+        <button
+          type="button"
+          onClick={() => {
+            if (!user) {
+              navigate(`/login?returnTo=${encodeURIComponent(`/listings/${property.id}`)}`)
+              return
+            }
+            setPaymentOpen(true)
+          }}
+          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 text-sm font-medium text-blue-500 transition-colors hover:bg-blue-500/15 dark:text-blue-400"
+        >
+          <Smartphone className="h-4 w-4" aria-hidden="true" />
+          Pay {property.purpose === 'rent' ? 'caution money' : 'reservation deposit'} ({formatRwf(paymentAmount)})
+        </button>
+      )}
       {whatsAppHref && (
         <a
           href={whatsAppHref}
@@ -40,6 +99,13 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
         </a>
       )}
       <ContactOwnerModal open={contactOpen} onClose={() => setContactOpen(false)} property={property} />
+      <MobileMoneyModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        property={property}
+        purpose={paymentPurpose}
+        amount={paymentAmount}
+      />
     </Card>
   )
 }

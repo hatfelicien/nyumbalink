@@ -1,6 +1,15 @@
 import { Home, MapPin } from 'lucide-react'
-import type { FilterState, PropertyStatus, PropertyType } from '../../types'
-import { AMENITIES, KIGALI_NEIGHBOURHOODS, PRICE_MAX, PRICE_MIN, PROPERTY_TYPES } from '../../utils/constants'
+import { useLanguage } from '../../context/LanguageContext'
+import type { FilterState, ListingPurpose, PropertyStatus, PropertyType } from '../../types'
+import {
+  AMENITIES,
+  KIGALI_NEIGHBOURHOODS,
+  PRICE_MAX,
+  PRICE_MIN,
+  PROPERTY_TYPES,
+  SALE_PRICE_MAX,
+  SALE_PRICE_MIN,
+} from '../../utils/constants'
 import { formatRwf } from '../../utils/format'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -11,6 +20,7 @@ import { cn } from '../../utils/cn'
 export interface FilterPanelProps {
   filters: FilterState
   setFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
+  setFilters: (patch: Partial<FilterState>) => void
   toggleAmenity: (amenity: FilterState['amenities'][number]) => void
   resetFilters: () => void
   className?: string
@@ -29,20 +39,58 @@ const STATUS_OPTIONS = [
   { value: 'available', label: 'Available' },
   { value: 'reserved', label: 'Reserved' },
   { value: 'rented', label: 'Rented' },
+  { value: 'sold', label: 'Sold' },
 ]
 
-export function FilterPanel({ filters, setFilter, toggleAmenity, resetFilters, className }: FilterPanelProps) {
+const PURPOSE_TABS: { value: ListingPurpose | ''; label: string }[] = [
+  { value: '', label: 'All' },
+  { value: 'rent', label: 'For rent' },
+  { value: 'sale', label: 'For sale' },
+]
+
+export function FilterPanel({ filters, setFilter, setFilters, toggleAmenity, resetFilters, className }: FilterPanelProps) {
+  const { t } = useLanguage()
+  const isSale = filters.purpose === 'sale'
+  const priceMin = isSale ? SALE_PRICE_MIN : PRICE_MIN
+  const priceMax = isSale ? SALE_PRICE_MAX : PRICE_MAX
+
+  function selectPurpose(next: ListingPurpose | null) {
+    setFilters({
+      purpose: next,
+      priceMin: next === 'sale' ? SALE_PRICE_MIN : PRICE_MIN,
+      priceMax: next === 'sale' ? SALE_PRICE_MAX : PRICE_MAX,
+    })
+  }
+
   return (
     <div className={cn('space-y-6', className)}>
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-navy-900 dark:text-white">Filters</h2>
+        <h2 className="text-base font-semibold text-navy-900 dark:text-white">{t('filters.title')}</h2>
         <Button variant="ghost" size="sm" onClick={resetFilters}>
-          Reset
+          {t('filters.reset')}
         </Button>
       </div>
 
+      <div className="flex rounded-xl border border-navy-700/15 p-1 dark:border-navy-700">
+        {PURPOSE_TABS.map((tab) => (
+          <button
+            key={tab.label}
+            type="button"
+            onClick={() => selectPurpose((tab.value || null) as ListingPurpose | null)}
+            className={cn(
+              'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              (filters.purpose ?? '') === tab.value
+                ? 'bg-blue-500 text-white shadow-glow'
+                : 'text-navy-900 hover:bg-navy-900/5 dark:text-white dark:hover:bg-white/10',
+            )}
+          >
+            {tab.value === '' ? t('filters.all') : t(tab.value === 'sale' ? 'listing.forSale' : 'listing.forRent')}
+          </button>
+        ))}
+      </div>
+
       <Input
-        label="Location"
+        label={t('filters.location')}
         placeholder="e.g. Kimironko, Kiyovu"
         leftIcon={<MapPin className="h-4 w-4" />}
         value={filters.location}
@@ -56,27 +104,24 @@ export function FilterPanel({ filters, setFilter, toggleAmenity, resetFilters, c
       </datalist>
 
       <RangeSlider
-        label="Monthly rent (RWF)"
-        min={PRICE_MIN}
-        max={PRICE_MAX}
-        step={10000}
+        label={isSale ? 'Sale price (RWF)' : 'Monthly rent (RWF)'}
+        min={priceMin}
+        max={priceMax}
+        step={isSale ? 5000000 : 10000}
         value={[filters.priceMin, filters.priceMax]}
-        onChange={([min, max]) => {
-          setFilter('priceMin', min)
-          setFilter('priceMax', max)
-        }}
+        onChange={([min, max]) => setFilters({ priceMin: min, priceMax: max })}
         formatValue={formatRwf}
       />
 
       <div className="grid grid-cols-2 gap-3">
         <Select
-          label="Bedrooms"
+          label={t('filters.bedrooms')}
           options={ROOM_OPTIONS}
           value={filters.bedrooms?.toString() ?? ''}
           onChange={(e) => setFilter('bedrooms', e.target.value ? Number(e.target.value) : null)}
         />
         <Select
-          label="Bathrooms"
+          label={t('filters.bathrooms')}
           options={ROOM_OPTIONS}
           value={filters.bathrooms?.toString() ?? ''}
           onChange={(e) => setFilter('bathrooms', e.target.value ? Number(e.target.value) : null)}
@@ -84,14 +129,14 @@ export function FilterPanel({ filters, setFilter, toggleAmenity, resetFilters, c
       </div>
 
       <Select
-        label="Property type"
+        label={t('filters.propertyType')}
         options={[{ value: '', label: 'Any type' }, ...PROPERTY_TYPES]}
         value={filters.type ?? ''}
         onChange={(e) => setFilter('type', (e.target.value || null) as PropertyType | null)}
       />
 
       <div>
-        <p className="mb-1.5 text-sm font-medium text-navy-900 dark:text-white">Furnished</p>
+        <p className="mb-1.5 text-sm font-medium text-navy-900 dark:text-white">{t('filters.furnished')}</p>
         <div className="flex gap-2">
           {[
             { label: 'Any', value: null },
@@ -118,7 +163,7 @@ export function FilterPanel({ filters, setFilter, toggleAmenity, resetFilters, c
       <div>
         <p className="mb-2 flex items-center gap-1.5 text-sm font-medium text-navy-900 dark:text-white">
           <Home className="h-4 w-4" aria-hidden="true" />
-          Amenities
+          {t('filters.amenities')}
         </p>
         <div className="grid grid-cols-2 gap-2">
           {AMENITIES.map((amenity) => {
@@ -148,7 +193,7 @@ export function FilterPanel({ filters, setFilter, toggleAmenity, resetFilters, c
       </div>
 
       <Select
-        label="Availability"
+        label={t('filters.availability')}
         options={STATUS_OPTIONS}
         value={filters.status ?? ''}
         onChange={(e) => setFilter('status', (e.target.value || null) as PropertyStatus | null)}

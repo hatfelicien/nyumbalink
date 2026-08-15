@@ -30,4 +30,6 @@ export const STORAGE_KEYS = {
   session: 'nyumbalink.session',
   favorites: 'nyumbalink.favorites',
   recentlyViewed: 'nyumbalink.recently-viewed',
+  language: 'nyumbalink.language',
+  theme: 'nyumbalink.theme',
 } as const

@@ -82,7 +82,8 @@ Every list has a loading skeleton, an empty state, and an error state with retry
 - A **WhatsApp** quick-contact button sits next to "Contact owner" on every listing, and a
   **Share** button copies the listing link (or opens the native share sheet on mobile)
 - Routes scroll to top on navigation, and a "Skip to content" link appears on first Tab press
-- Theme defaults to your OS's light/dark preference, then can be toggled manually per session
+- Theme always starts in light mode; toggling it manually persists your choice for next time
+- A Kinyarwanda / English language toggle sits next to the theme toggle and persists too
 
 ## Tech stack
 
@@ -135,11 +136,10 @@ No component or page imports `src/data/` directly, so this is the only layer tha
 - This is a demo dataset: 24 listings, 10 users, and a handful of enquiries/reviews/applications.
 - Photo uploads use `URL.createObjectURL` — nothing is actually persisted, and object URLs are
   lost on refresh.
-- Your logged-in session, saved listings, and recently-viewed list persist in `localStorage`
-  (see `src/utils/storage.ts`) so they survive a refresh. Everything else — the mock
-  properties/users/enquiries data, and any create/update/delete you make against it — lives in
-  an in-memory store per service and resets on reload, since there's no real backend yet.
-- Theme choice (light/dark) is deliberately React-state-only and resets to your OS preference
-  on reload, per the design brief.
+- Your logged-in session, saved listings, recently-viewed list, theme choice, and language
+  choice persist in `localStorage` (see `src/utils/storage.ts`) so they survive a refresh.
+  Everything else — the mock properties/users/enquiries/chat data, and any create/update/delete
+  you make against it — lives in an in-memory store per service and resets on reload, since
+  there's no real backend yet.
 - Not tested against a screen reader; accessibility work covers semantic HTML, keyboard
   navigation, focus-visible rings, aria-labels on icon-only buttons, and modal focus trapping.

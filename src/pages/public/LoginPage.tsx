@@ -7,6 +7,7 @@ import { DemoCredentialsPanel } from '../../components/layout/DemoCredentialsPan
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../hooks/useToast'
 import type { Role } from '../../types'
 
@@ -25,6 +26,7 @@ const ROLE_HOME: Record<Role, string> = {
 
 export function LoginPage() {
   const { login } = useAuth()
+  const { t } = useLanguage()
   const { showToast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -63,27 +65,27 @@ export function LoginPage() {
 
   return (
     <AuthCard
-      title="Log in"
-      subtitle="Welcome back. Enter your details to continue."
+      title={t('auth.login.title')}
+      subtitle={t('auth.login.subtitle')}
       footer={
         <>
-          Don&apos;t have an account?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link to="/register" className="font-medium text-blue-500 hover:text-blue-400">
-            Sign up
+            {t('auth.login.signUp')}
           </Link>
         </>
       }
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input label="Email" type="email" {...register('email')} error={errors.email?.message} />
+        <Input label={t('auth.login.email')} type="email" {...register('email')} error={errors.email?.message} />
         <div>
-          <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
+          <Input label={t('auth.login.password')} type="password" {...register('password')} error={errors.password?.message} />
           <Link to="/forgot-password" className="mt-1.5 inline-block text-sm text-blue-500 hover:text-blue-400">
-            Forgot password?
+            {t('auth.login.forgot')}
           </Link>
         </div>
         <Button type="submit" className="w-full" loading={isSubmitting}>
-          Log in
+          {t('auth.login.submit')}
         </Button>
       </form>
 

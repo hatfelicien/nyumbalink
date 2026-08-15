@@ -69,7 +69,10 @@ export function PropertyMap({
         >
           <Popup>
             <div className="min-w-[10rem]">
-              <p className="font-semibold text-navy-900">{formatRwf(property.price)}/mo</p>
+              <p className="font-semibold text-navy-900">
+                {formatRwf(property.price)}
+                {property.purpose === 'rent' && '/mo'}
+              </p>
               <p className="text-sm text-slate-500">{property.title}</p>
               <Link to={`/listings/${property.id}`} className="mt-1 inline-block text-sm font-medium text-blue-500">
                 View listing →

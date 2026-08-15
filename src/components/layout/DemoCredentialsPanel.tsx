@@ -1,4 +1,5 @@
 import { ShieldCheck, User, UserCog } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 import { cn } from '../../utils/cn'
 
 export interface DemoAccount {
@@ -14,10 +15,12 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
 ]
 
 export function DemoCredentialsPanel({ onSelect, loading }: { onSelect: (email: string) => void; loading?: boolean }) {
+  const { t } = useLanguage()
+
   return (
     <div className="rounded-xl border border-dashed border-navy-700/20 p-4 dark:border-navy-700">
-      <p className="text-sm font-medium text-navy-900 dark:text-white">Demo accounts</p>
-      <p className="mt-1 text-xs text-slate-500">Any password works. Click one to sign in instantly.</p>
+      <p className="text-sm font-medium text-navy-900 dark:text-white">{t('auth.demo.title')}</p>
+      <p className="mt-1 text-xs text-slate-500">{t('auth.demo.subtitle')}</p>
       <div className="mt-3 space-y-2">
         {DEMO_ACCOUNTS.map((account) => (
           <button

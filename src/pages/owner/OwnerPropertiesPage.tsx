@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { CalendarClock, Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { AvailabilityModal } from '../../components/dashboard/AvailabilityModal'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
@@ -14,15 +15,17 @@ import { useAsync } from '../../hooks/useAsync'
 import { useToast } from '../../hooks/useToast'
 import { propertiesService } from '../../services/propertiesService'
 import type { Property } from '../../types'
-import { formatRwf } from '../../utils/format'
+import { formatDate, formatRwf } from '../../utils/format'
 
 const LISTING_VARIANT = { draft: 'neutral', pending: 'pending', published: 'success', flagged: 'danger' } as const
+const STATUS_VARIANT = { available: 'success', reserved: 'pending', rented: 'danger', sold: 'danger' } as const
 
 export function OwnerPropertiesPage() {
   const { user } = useAuth()
   const { data, loading, error, reload } = useAsync(() => propertiesService.getByOwner(user!.id), [user?.id])
   const { showToast } = useToast()
   const [deleteTarget, setDeleteTarget] = useState<Property | null>(null)
+  const [availabilityTarget, setAvailabilityTarget] = useState<Property | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
 
   async function togglePublish(property: Property) {
@@ -61,19 +64,34 @@ export function OwnerPropertiesPage() {
       ),
     },
     {
+      key: 'purpose',
+      header: 'Purpose',
+      render: (row) => <Badge variant="brand">{row.purpose === 'sale' ? 'For sale' : 'For rent'}</Badge>,
+    },
+    {
       key: 'price',
-      header: 'Rent',
+      header: 'Price',
       sortable: true,
       sortValue: (row) => row.price,
-      render: (row) => formatRwf(row.price),
+      render: (row) => (
+        <>
+          {formatRwf(row.price)}
+          {row.purpose === 'rent' && <span className="text-slate-500">/mo</span>}
+        </>
+      ),
     },
     {
       key: 'status',
       header: 'Availability',
       render: (row) => (
-        <Badge variant={row.status === 'available' ? 'success' : row.status === 'reserved' ? 'pending' : 'danger'} className="capitalize">
-          {row.status}
-        </Badge>
+        <button type="button" onClick={() => setAvailabilityTarget(row)} className="group inline-flex items-center gap-1.5">
+          <Badge variant={STATUS_VARIANT[row.status]} className="capitalize group-hover:opacity-80">
+            {row.status}
+          </Badge>
+          {row.status !== 'available' && row.availableFrom && (
+            <span className="text-xs text-slate-500">from {formatDate(row.availableFrom)}</span>
+          )}
+        </button>
       ),
     },
     {
@@ -105,6 +123,9 @@ export function OwnerPropertiesPage() {
             onClick={() => togglePublish(row)}
           >
             {row.listingStatus === 'published' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Update availability" onClick={() => setAvailabilityTarget(row)}>
+            <CalendarClock className="h-4 w-4" />
           </Button>
           <Link to={`/owner/properties/${row.id}/edit`}>
             <Button variant="ghost" size="icon" aria-label="Edit">
@@ -156,6 +177,7 @@ export function OwnerPropertiesPage() {
         confirmLabel="Delete"
         loading={busyId === deleteTarget?.id}
       />
+      <AvailabilityModal property={availabilityTarget} onClose={() => setAvailabilityTarget(null)} onSaved={reload} />
     </div>
   )
 }

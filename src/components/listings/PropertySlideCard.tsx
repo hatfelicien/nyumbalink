@@ -7,7 +7,7 @@ import { Rating } from '../ui/Rating'
 import { FavoriteButton } from './FavoriteButton'
 import { formatRwf } from '../../utils/format'
 
-const STATUS_VARIANT = { available: 'success', reserved: 'pending', rented: 'danger' } as const
+const STATUS_VARIANT = { available: 'success', reserved: 'pending', rented: 'danger', sold: 'danger' } as const
 
 export interface PropertySlideCardProps {
   property: Property | null
@@ -37,7 +37,10 @@ export function PropertySlideCard({ property, onClose }: PropertySlideCardProps)
           <FavoriteButton propertyId={property.id} className="absolute left-2 top-2 z-10" />
           <div className="space-y-2 p-4">
             <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold text-navy-900 dark:text-white">{formatRwf(property.price)}/mo</p>
+              <p className="text-lg font-semibold text-navy-900 dark:text-white">
+                {formatRwf(property.price)}
+                {property.purpose === 'rent' && '/mo'}
+              </p>
               <Badge variant={STATUS_VARIANT[property.status]} className="capitalize">
                 {property.status}
               </Badge>

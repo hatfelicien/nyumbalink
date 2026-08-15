@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Ban, CheckCircle2, Eye, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { Ban, CheckCircle2, Eye, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from 'lucide-react'
 import { OwnerFormModal } from '../../components/dashboard/OwnerFormModal'
 import type { OwnerFormValues } from '../../components/dashboard/OwnerFormModal'
 import { ViewUserModal } from '../../components/dashboard/ViewUserModal'
@@ -81,6 +81,14 @@ export function AdminOwnersPage() {
     reload()
   }
 
+  async function toggleVerified(owner: User) {
+    setBusyId(owner.id)
+    await usersService.update(owner.id, { verified: !owner.verified })
+    showToast(owner.verified ? 'Verification removed' : 'Owner verified', { variant: 'success' })
+    setBusyId(null)
+    reload()
+  }
+
   async function handleDelete() {
     if (!deleteTarget) return
     setBusyId(deleteTarget.id)
@@ -117,6 +125,19 @@ export function AdminOwnersPage() {
         </Badge>
       ),
     },
+    {
+      key: 'verified',
+      header: 'Verified',
+      render: (row) =>
+        row.verified ? (
+          <Badge variant="brand" className="gap-1">
+            <ShieldCheck className="h-3 w-3" aria-hidden="true" />
+            Verified
+          </Badge>
+        ) : (
+          <Badge variant="neutral">Unverified</Badge>
+        ),
+    },
     { key: 'createdAt', header: 'Joined', sortable: true, sortValue: (row) => row.createdAt, render: (row) => formatDate(row.createdAt) },
     {
       key: 'actions',
@@ -146,6 +167,15 @@ export function AdminOwnersPage() {
             onClick={() => toggleStatus(row)}
           >
             {row.status === 'suspended' ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Ban className="h-4 w-4 text-amber-500" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={row.verified ? 'Remove verification' : 'Verify owner'}
+            disabled={busyId === row.id}
+            onClick={() => toggleVerified(row)}
+          >
+            {row.verified ? <ShieldOff className="h-4 w-4 text-slate-500" /> : <ShieldCheck className="h-4 w-4 text-blue-500" />}
           </Button>
           <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => setDeleteTarget(row)}>
             <Trash2 className="h-4 w-4 text-rose-500" />

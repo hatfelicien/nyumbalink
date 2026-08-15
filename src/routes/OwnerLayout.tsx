@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { Inbox, LayoutGrid, PlusCircle, Settings, SquareGanttChart } from 'lucide-react'
+import { Inbox, LayoutGrid, MessagesSquare, PlusCircle, Settings, SquareGanttChart } from 'lucide-react'
 import { DashboardShell } from '../components/layout/DashboardShell'
 import type { SidebarLink } from '../components/layout/Sidebar'
 import { OwnerNotificationBell } from '../components/dashboard/OwnerNotificationBell'
@@ -10,6 +10,7 @@ const LINKS: SidebarLink[] = [
   { to: '/owner/properties', label: 'My properties', icon: LayoutGrid },
   { to: '/owner/properties/new', label: 'Add property', icon: PlusCircle },
   { to: '/owner/enquiries', label: 'Enquiries', icon: Inbox },
+  { to: '/owner/messages', label: 'Messages', icon: MessagesSquare },
   { to: '/owner/profile', label: 'Profile', icon: Settings },
 ]
 
@@ -18,6 +19,7 @@ const TITLES: Record<string, string> = {
   '/owner/properties': 'My properties',
   '/owner/properties/new': 'Add property',
   '/owner/enquiries': 'Enquiries',
+  '/owner/messages': 'Messages',
   '/owner/profile': 'Profile settings',
 }
 

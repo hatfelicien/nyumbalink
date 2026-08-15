@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Skeleton } from './components/ui/Skeleton'
 import { AuthProvider } from './context/AuthContext'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { LanguageProvider } from './context/LanguageContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ToastProvider } from './context/ToastContext'
 import { AdminLayout } from './routes/AdminLayout'
@@ -17,6 +18,7 @@ const AdminPropertiesPage = lazy(() => import('./pages/admin/AdminPropertiesPage
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage').then((m) => ({ default: m.AdminSettingsPage })))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage').then((m) => ({ default: m.AdminUsersPage })))
 const OwnerEnquiriesPage = lazy(() => import('./pages/owner/OwnerEnquiriesPage').then((m) => ({ default: m.OwnerEnquiriesPage })))
+const OwnerMessagesPage = lazy(() => import('./pages/owner/OwnerMessagesPage').then((m) => ({ default: m.OwnerMessagesPage })))
 const OwnerOverviewPage = lazy(() => import('./pages/owner/OwnerOverviewPage').then((m) => ({ default: m.OwnerOverviewPage })))
 const OwnerProfilePage = lazy(() => import('./pages/owner/OwnerProfilePage').then((m) => ({ default: m.OwnerProfilePage })))
 const OwnerPropertiesPage = lazy(() => import('./pages/owner/OwnerPropertiesPage').then((m) => ({ default: m.OwnerPropertiesPage })))
@@ -30,6 +32,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/public/ForgotPasswordPage'
 const LandingPage = lazy(() => import('./pages/public/LandingPage').then((m) => ({ default: m.LandingPage })))
 const LoginPage = lazy(() => import('./pages/public/LoginPage').then((m) => ({ default: m.LoginPage })))
 const MapSearchPage = lazy(() => import('./pages/public/MapSearchPage').then((m) => ({ default: m.MapSearchPage })))
+const MessagesPage = lazy(() => import('./pages/public/MessagesPage').then((m) => ({ default: m.MessagesPage })))
 const NotFoundPage = lazy(() => import('./pages/public/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
 const PropertyDetailPage = lazy(() => import('./pages/public/PropertyDetailPage').then((m) => ({ default: m.PropertyDetailPage })))
 const RegisterPage = lazy(() => import('./pages/public/RegisterPage').then((m) => ({ default: m.RegisterPage })))
@@ -47,6 +50,7 @@ function RouteFallback() {
 function App() {
   return (
     <ThemeProvider>
+      <LanguageProvider>
       <ToastProvider>
         <AuthProvider>
           <FavoritesProvider>
@@ -59,6 +63,14 @@ function App() {
                     <Route path="listings/:id" element={<PropertyDetailPage />} />
                     <Route path="map" element={<MapSearchPage />} />
                     <Route path="saved" element={<SavedListingsPage />} />
+                    <Route
+                      path="messages"
+                      element={
+                        <ProtectedRoute allowedRoles={['guest', 'owner', 'admin']}>
+                          <MessagesPage />
+                        </ProtectedRoute>
+                      }
+                    />
                     <Route path="login" element={<LoginPage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route path="become-an-owner" element={<BecomeOwnerPage />} />
@@ -83,6 +95,7 @@ function App() {
                     <Route path="properties/new" element={<PropertyWizardPage />} />
                     <Route path="properties/:id/edit" element={<PropertyWizardPage />} />
                     <Route path="enquiries" element={<OwnerEnquiriesPage />} />
+                    <Route path="messages" element={<OwnerMessagesPage />} />
                     <Route path="profile" element={<OwnerProfilePage />} />
                   </Route>
 
@@ -107,6 +120,7 @@ function App() {
           </FavoritesProvider>
         </AuthProvider>
       </ToastProvider>
+      </LanguageProvider>
     </ThemeProvider>
   )
 }

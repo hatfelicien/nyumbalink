@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Menu } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { LogOut, Menu } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { Avatar } from '../ui/Avatar'
+import { Button } from '../ui/Button'
 import { Drawer } from '../ui/Drawer'
+import { LanguageToggle } from './LanguageToggle'
 import type { SidebarLink } from './Sidebar'
 import { Sidebar } from './Sidebar'
 import { SkipToContent } from './SkipToContent'
@@ -18,15 +21,22 @@ export interface DashboardShellProps {
 
 export function DashboardShell({ links, title, children, headerExtra }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    setDrawerOpen(false)
+    navigate('/')
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-navy-950">
       <SkipToContent />
-      <Sidebar links={links} className="fixed inset-y-0 hidden lg:flex" />
+      <Sidebar links={links} onLogout={handleLogout} className="fixed inset-y-0 hidden lg:flex" />
 
       <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title="">
-        <Sidebar links={links} onNavigate={() => setDrawerOpen(false)} className="-mx-5 -my-5 w-auto" />
+        <Sidebar links={links} onNavigate={() => setDrawerOpen(false)} onLogout={handleLogout} className="-mx-5 -my-5 w-auto" />
       </Drawer>
 
       <div className="flex flex-1 flex-col lg:pl-64">
@@ -45,8 +55,12 @@ export function DashboardShell({ links, title, children, headerExtra }: Dashboar
 
           <div className="flex items-center gap-2">
             {headerExtra}
+            <LanguageToggle />
             <ThemeToggle />
             {user && <Avatar name={user.name} src={user.avatar} size="sm" />}
+            <Button variant="ghost" size="icon" aria-label="Log out" onClick={handleLogout} className="hidden lg:inline-flex">
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+            </Button>
           </div>
         </header>
 

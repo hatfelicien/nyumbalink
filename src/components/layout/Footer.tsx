@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 import { Logo } from './Logo'
 
 const COLUMNS = [
@@ -29,16 +30,15 @@ const COLUMNS = [
 ]
 
 export function Footer() {
+  const { t } = useLanguage()
+
   return (
     <footer className="border-t border-navy-700 bg-navy-900 text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo inverted />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
-              Find and list rental houses and apartments across Kigali — from budget shared rooms to
-              executive villas.
-            </p>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">{t('footer.tagline')}</p>
             <div className="mt-5 flex gap-3">
               {[Facebook, Instagram, Twitter].map((Icon, index) => (
                 <a
@@ -70,8 +70,8 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} NyumbaLink. All rights reserved.</p>
-          <p>Made for renters and owners across Kigali.</p>
+          <p>© {new Date().getFullYear()} NyumbaLink. {t('footer.rights')}</p>
+          <p>{t('footer.madeFor')}</p>
         </div>
       </div>
     </footer>

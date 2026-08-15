@@ -20,7 +20,7 @@ const PAGE_SIZE = 9
 
 export function BrowsePage() {
   const { data, loading, error, reload } = useAsync(() => propertiesService.list(), [])
-  const { filters, setFilter, toggleAmenity, resetFilters } = useFilters()
+  const { filters, setFilter, setFilters, toggleAmenity, resetFilters } = useFilters()
   const isDesktop = useMediaQuery(breakpoints.lg)
 
   const [view, setView] = useState<'grid' | 'list'>('grid')
@@ -38,6 +38,11 @@ export function BrowsePage() {
     setFilter(key, value)
   }
 
+  function handleFiltersChange(patch: Partial<typeof filters>) {
+    setPage(1)
+    setFilters(patch)
+  }
+
   const showMap = isDesktop || mobileView === 'map'
   const showList = isDesktop || mobileView === 'list'
 
@@ -47,6 +52,7 @@ export function BrowsePage() {
         <FilterPanel
           filters={filters}
           setFilter={handleFilterChange}
+          setFilters={handleFiltersChange}
           toggleAmenity={toggleAmenity}
           resetFilters={resetFilters}
           className="hidden lg:block"
@@ -65,7 +71,12 @@ export function BrowsePage() {
           />
 
           <div className="mt-4">
-            <FilterChips filters={filters} setFilter={handleFilterChange} toggleAmenity={toggleAmenity} />
+            <FilterChips
+              filters={filters}
+              setFilter={handleFilterChange}
+              setFilters={handleFiltersChange}
+              toggleAmenity={toggleAmenity}
+            />
           </div>
 
           {showList && (
@@ -132,7 +143,13 @@ export function BrowsePage() {
       </div>
 
       <Drawer open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filters">
-        <FilterPanel filters={filters} setFilter={handleFilterChange} toggleAmenity={toggleAmenity} resetFilters={resetFilters} />
+        <FilterPanel
+          filters={filters}
+          setFilter={handleFilterChange}
+          setFilters={handleFiltersChange}
+          toggleAmenity={toggleAmenity}
+          resetFilters={resetFilters}
+        />
       </Drawer>
     </div>
   )

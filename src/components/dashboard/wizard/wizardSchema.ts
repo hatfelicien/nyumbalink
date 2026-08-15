@@ -4,8 +4,11 @@ import { KIGALI_CENTER } from '../../../utils/constants'
 export const wizardSchema = z.object({
   title: z.string().min(5, 'Title should be at least 5 characters'),
   type: z.enum(['apartment', 'bungalow', 'studio', 'villa', 'shared room']),
+  purpose: z.enum(['rent', 'sale']),
   description: z.string().min(20, 'Add a longer description (20+ characters)'),
   price: z.coerce.number().positive('Price must be greater than 0'),
+  negotiable: z.boolean(),
+  cautionMoney: z.coerce.number().min(0, 'Cannot be negative'),
   bedrooms: z.coerce.number().min(0, 'Cannot be negative'),
   bathrooms: z.coerce.number().min(0, 'Cannot be negative'),
   sizeSqm: z.coerce.number().positive('Size must be greater than 0'),
@@ -27,8 +30,8 @@ export const WIZARD_STEPS = [
 ]
 
 export const STEP_FIELDS: (keyof WizardValues)[][] = [
-  ['title', 'type', 'description'],
-  ['price', 'bedrooms', 'bathrooms', 'sizeSqm', 'furnished', 'amenities'],
+  ['title', 'type', 'purpose', 'description'],
+  ['price', 'negotiable', 'cautionMoney', 'bedrooms', 'bathrooms', 'sizeSqm', 'furnished', 'amenities'],
   ['address', 'coordinates'],
   ['images'],
   [],
@@ -37,8 +40,11 @@ export const STEP_FIELDS: (keyof WizardValues)[][] = [
 export const DEFAULT_WIZARD_VALUES: WizardValues = {
   title: '',
   type: 'apartment',
+  purpose: 'rent',
   description: '',
   price: 0,
+  negotiable: false,
+  cautionMoney: 0,
   bedrooms: 1,
   bathrooms: 1,
   sizeSqm: 0,

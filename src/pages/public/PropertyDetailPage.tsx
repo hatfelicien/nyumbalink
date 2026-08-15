@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { BedDouble, Maximize, MapPin, ShowerHead, Sofa } from 'lucide-react'
+import { BedDouble, Maximize, MapPin, ShowerHead, Sofa, Tag } from 'lucide-react'
 import { AmenityGrid } from '../../components/listings/AmenityGrid'
 import { FavoriteButton } from '../../components/listings/FavoriteButton'
 import { OwnerCard } from '../../components/listings/OwnerCard'
@@ -18,10 +18,10 @@ import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
 import { propertiesService } from '../../services/propertiesService'
 import { usersService } from '../../services/usersService'
 import { distanceKm, KIGALI_LANDMARKS } from '../../utils/constants'
-import { formatRwf } from '../../utils/format'
+import { formatDate, formatRwf } from '../../utils/format'
 import { NotFoundPage } from './NotFoundPage'
 
-const STATUS_VARIANT = { available: 'success', reserved: 'pending', rented: 'danger' } as const
+const STATUS_VARIANT = { available: 'success', reserved: 'pending', rented: 'danger', sold: 'danger' } as const
 
 export function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -76,6 +76,9 @@ export function PropertyDetailPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <Badge variant="brand" className="bg-navy-900 text-white dark:bg-white/10">
+                  {property.purpose === 'sale' ? 'For sale' : 'For rent'}
+                </Badge>
                 <Badge variant={STATUS_VARIANT[property.status]} className="capitalize">
                   {property.status}
                 </Badge>
@@ -84,13 +87,31 @@ export function PropertyDetailPage() {
               </div>
             </div>
 
+            {property.status !== 'available' && property.availableFrom && (
+              <p className="mt-3 text-sm text-amber-600 dark:text-amber-400">
+                Expected to be available again from {formatDate(property.availableFrom)}.
+              </p>
+            )}
+
             <div className="mt-4 flex flex-wrap items-center gap-5">
               <p className="text-3xl font-bold text-navy-900 dark:text-white">
                 {formatRwf(property.price)}
-                <span className="text-base font-normal text-slate-500">/month</span>
+                {property.purpose === 'rent' && <span className="text-base font-normal text-slate-500">/month</span>}
               </p>
+              {property.negotiable && (
+                <Badge variant="brand" dot>
+                  Negotiable
+                </Badge>
+              )}
               <Rating value={property.rating} count={property.reviewCount} />
             </div>
+
+            {property.purpose === 'rent' && property.cautionMoney > 0 && (
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
+                <Tag className="h-4 w-4" aria-hidden="true" />
+                Caution money (refundable deposit): <span className="font-medium text-navy-900 dark:text-white">{formatRwf(property.cautionMoney)}</span>
+              </p>
+            )}
 
             <div className="mt-6 flex flex-wrap gap-6 border-y border-navy-700/10 py-4 text-sm text-navy-900 dark:border-navy-700 dark:text-white">
               <span className="flex items-center gap-2">

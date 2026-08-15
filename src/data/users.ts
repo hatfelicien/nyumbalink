@@ -22,6 +22,7 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1198780012345678',
     status: 'active',
+    verified: true,
     createdAt: '2024-02-14T08:00:00.000Z',
   },
   {
@@ -34,6 +35,7 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1198880023456789',
     status: 'active',
+    verified: true,
     createdAt: '2024-03-02T08:00:00.000Z',
   },
   {

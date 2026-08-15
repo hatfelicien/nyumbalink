@@ -14,6 +14,9 @@ export function StepDetails({ form }: { form: UseFormReturn<WizardValues> }) {
 
   const furnished = watch('furnished')
   const amenities = watch('amenities')
+  const purpose = watch('purpose')
+  const negotiable = watch('negotiable')
+  const isRent = purpose === 'rent'
 
   function toggleAmenity(value: string) {
     const next = amenities.includes(value) ? amenities.filter((a) => a !== value) : [...amenities, value]
@@ -24,12 +27,22 @@ export function StepDetails({ form }: { form: UseFormReturn<WizardValues> }) {
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Monthly rent (RWF)"
+          label={isRent ? 'Monthly rent (RWF)' : 'Sale price (RWF)'}
           type="number"
           min={0}
           {...register('price', { valueAsNumber: true })}
           error={errors.price?.message}
         />
+        {isRent && (
+          <Input
+            label="Caution money (RWF)"
+            hint="Refundable deposit collected before move-in"
+            type="number"
+            min={0}
+            {...register('cautionMoney', { valueAsNumber: true })}
+            error={errors.cautionMoney?.message}
+          />
+        )}
         <Input
           label="Size (m²)"
           type="number"
@@ -52,6 +65,19 @@ export function StepDetails({ form }: { form: UseFormReturn<WizardValues> }) {
           error={errors.bathrooms?.message}
         />
       </div>
+
+      <label className="flex cursor-pointer items-center justify-between rounded-lg border border-navy-700/15 px-3.5 py-3 dark:border-navy-700">
+        <div>
+          <p className="text-sm font-medium text-navy-900 dark:text-white">Price is negotiable</p>
+          <p className="text-xs text-slate-500">Shows a "Negotiable" tag to guests browsing this listing.</p>
+        </div>
+        <input
+          type="checkbox"
+          checked={negotiable}
+          onChange={(e) => setValue('negotiable', e.target.checked)}
+          className="h-5 w-5 rounded border-navy-700/30 text-blue-500 focus-visible:ring-blue-400"
+        />
+      </label>
 
       <div>
         <p className="mb-1.5 text-sm font-medium text-navy-900 dark:text-white">Furnished</p>

@@ -1,12 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { FilterState } from '../../types'
-import { AMENITIES, PRICE_MAX, PRICE_MIN, PROPERTY_TYPES } from '../../utils/constants'
+import { AMENITIES, PRICE_MAX, PRICE_MIN, PROPERTY_TYPES, SALE_PRICE_MAX, SALE_PRICE_MIN } from '../../utils/constants'
 import { formatRwf } from '../../utils/format'
 
 export interface FilterPanelSetters {
   filters: FilterState
   setFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
+  setFilters: (patch: Partial<FilterState>) => void
   toggleAmenity: (amenity: FilterState['amenities'][number]) => void
 }
 
@@ -16,20 +17,27 @@ interface Chip {
   onRemove: () => void
 }
 
-function buildChips({ filters, setFilter, toggleAmenity }: FilterPanelSetters): Chip[] {
+function buildChips({ filters, setFilter, setFilters, toggleAmenity }: FilterPanelSetters): Chip[] {
   const chips: Chip[] = []
 
   if (filters.location) {
     chips.push({ key: 'location', label: filters.location, onRemove: () => setFilter('location', '') })
   }
-  if (filters.priceMin !== PRICE_MIN || filters.priceMax !== PRICE_MAX) {
+  const isSale = filters.purpose === 'sale'
+  const defaultMin = isSale ? SALE_PRICE_MIN : PRICE_MIN
+  const defaultMax = isSale ? SALE_PRICE_MAX : PRICE_MAX
+  if (filters.priceMin !== defaultMin || filters.priceMax !== defaultMax) {
     chips.push({
       key: 'price',
       label: `${formatRwf(filters.priceMin)} – ${formatRwf(filters.priceMax)}`,
-      onRemove: () => {
-        setFilter('priceMin', PRICE_MIN)
-        setFilter('priceMax', PRICE_MAX)
-      },
+      onRemove: () => setFilters({ priceMin: defaultMin, priceMax: defaultMax }),
+    })
+  }
+  if (filters.purpose) {
+    chips.push({
+      key: 'purpose',
+      label: filters.purpose === 'sale' ? 'For sale' : 'For rent',
+      onRemove: () => setFilters({ purpose: null, priceMin: PRICE_MIN, priceMax: PRICE_MAX }),
     })
   }
   if (filters.bedrooms !== null) {

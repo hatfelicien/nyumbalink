@@ -1,8 +1,11 @@
 import { Car, Droplets, Fan, Fuel, Shield, Trees, Wifi } from 'lucide-react'
-import type { Amenity, PropertyType } from '../types'
+import type { Amenity, ListingPurpose, PaymentMethod, PropertyType } from '../types'
 
 export const PRICE_MIN = 0
 export const PRICE_MAX = 2500000
+
+export const SALE_PRICE_MIN = 0
+export const SALE_PRICE_MAX = 400000000
 
 export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
   { value: 'apartment', label: 'Apartment' },
@@ -10,6 +13,16 @@ export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
   { value: 'studio', label: 'Studio' },
   { value: 'villa', label: 'Villa' },
   { value: 'shared room', label: 'Shared room' },
+]
+
+export const LISTING_PURPOSES: { value: ListingPurpose; label: string }[] = [
+  { value: 'rent', label: 'For rent' },
+  { value: 'sale', label: 'For sale' },
+]
+
+export const PAYMENT_METHODS: { value: PaymentMethod; label: string; color: string }[] = [
+  { value: 'mtn_momo', label: 'MTN Mobile Money', color: '#FFCB05' },
+  { value: 'airtel_money', label: 'Airtel Money', color: '#ED1C24' },
 ]
 
 export const AMENITIES: { value: Amenity; label: string; icon: typeof Wifi }[] = [
