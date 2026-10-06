@@ -29,7 +29,7 @@ const LINKS: SidebarLink[] = [
   { to: '/owner/maintenance', label: 'Maintenance', icon: Wrench, section: 'Rentals' },
   { to: '/owner/enquiries', label: 'Enquiries', icon: Inbox, section: 'Inbox' },
   { to: '/owner/messages', label: 'Messages', icon: MessagesSquare, section: 'Inbox' },
-  { to: '/owner/profile', label: 'Profile', icon: Settings, section: 'Account' },
+  { to: '/owner/profile', label: 'Profile & settings', icon: Settings, section: 'Account' },
 ]
 
 const MOBILE_TABS: MobileTab[] = [
@@ -50,7 +50,7 @@ const TITLES: Record<string, string> = {
   '/owner/maintenance': 'Maintenance requests',
   '/owner/enquiries': 'Enquiries',
   '/owner/messages': 'Messages',
-  '/owner/profile': 'Profile settings',
+  '/owner/profile': 'Profile & settings',
 }
 
 function resolveTitle(pathname: string) {

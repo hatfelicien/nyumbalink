@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Bell, CalendarDays, Check, FileSignature, FileText, Wrench } from 'lucide-react'
+import { Bell, CalendarDays, Check, FileSignature, FileText, UserRound, Wrench } from 'lucide-react'
 import { MaintenanceRequestModal } from '../../components/rentals/MaintenanceRequestModal'
 import {
   AGREEMENT_STATUS,
@@ -162,8 +162,17 @@ export function AccountPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <h1 className="text-2xl font-semibold text-navy-900 dark:text-white sm:text-3xl">{t('nav.myRentals')}</h1>
-      <p className="mt-2 text-slate-500">Your viewings, applications, agreements and repairs in one place.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-navy-900 dark:text-white sm:text-3xl">{t('nav.myRentals')}</h1>
+          <p className="mt-2 text-slate-500">Your viewings, applications, agreements and repairs in one place.</p>
+        </div>
+        <Link to="/profile">
+          <Button variant="secondary" size="sm" icon={<UserRound className="h-4 w-4" />}>
+            Profile & settings
+          </Button>
+        </Link>
+      </div>
 
       <ol className="mt-6 grid grid-cols-4 gap-2">
         {journey.map((step, index) => (

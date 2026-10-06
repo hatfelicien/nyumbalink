@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { BadgeCheck, Building2, ClipboardList, Flag, LayoutGrid, MessageSquareWarning, Settings, UserCog, Users } from 'lucide-react'
+import { BadgeCheck, Building2, CircleUserRound, ClipboardList, Flag, LayoutGrid, MessageSquareWarning, Settings, UserCog, Users } from 'lucide-react'
 import { DashboardShell } from '../components/layout/DashboardShell'
 import type { MobileTab } from '../components/layout/MobileTabBar'
 import type { SidebarLink } from '../components/layout/Sidebar'
@@ -15,7 +15,8 @@ const LINKS: SidebarLink[] = [
   { to: '/admin/applications', label: 'Owner applications', icon: ClipboardList, section: 'Marketplace' },
   { to: '/admin/properties', label: 'All properties', icon: Building2, section: 'Marketplace' },
   { to: '/admin/users', label: 'Manage users', icon: Users, section: 'Marketplace' },
-  { to: '/admin/settings', label: 'Settings', icon: Settings, section: 'Platform' },
+  { to: '/admin/settings', label: 'Platform settings', icon: Settings, section: 'Platform' },
+  { to: '/admin/profile', label: 'My profile', icon: CircleUserRound, section: 'Account' },
 ]
 
 const MOBILE_TABS: MobileTab[] = [
@@ -34,7 +35,8 @@ const TITLES: Record<string, string> = {
   '/admin/applications': 'Owner applications',
   '/admin/properties': 'All properties',
   '/admin/users': 'Manage users',
-  '/admin/settings': 'Settings',
+  '/admin/settings': 'Platform settings',
+  '/admin/profile': 'Profile & settings',
 }
 
 export function AdminLayout() {

@@ -27,8 +27,9 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
   const [applyOpen, setApplyOpen] = useState(false)
   const [startingChat, setStartingChat] = useState(false)
 
-  const whatsAppHref = owner.phone
-    ? buildWhatsAppLink(owner.phone, `Hi, I am interested in "${property.title}" on NyumbaLink. Is it still available?`)
+  const whatsAppNumber = owner.whatsapp || owner.phone
+  const whatsAppHref = whatsAppNumber
+    ? buildWhatsAppLink(whatsAppNumber, `Hi, I am interested in "${property.title}" on NyumbaLink. Is it still available?`)
     : null
 
   const paymentPurpose = property.purpose === 'rent' ? 'caution' : 'reservation'
@@ -66,6 +67,8 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
           <VerificationBadge kind="landlord" status={owner.verification ?? 'unverified'} showUnverified className="mt-1.5" />
         </div>
       </div>
+
+      {owner.bio && <p className="text-sm leading-relaxed text-slate-500">{owner.bio}</p>}
 
       {!isOwnListing && (
         <Button onClick={() => requireLogin('schedule a viewing') && setViewingOpen(true)} icon={<CalendarDays className="h-4 w-4" />}>

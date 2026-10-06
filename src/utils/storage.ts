@@ -36,4 +36,5 @@ export const STORAGE_KEYS = {
   savedSearches: 'nyumbalink.saved-searches',
   dataSaver: 'nyumbalink.data-saver',
   notificationPrefs: 'nyumbalink.notification-prefs',
+  profiles: 'nyumbalink.profiles',
 } as const

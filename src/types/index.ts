@@ -8,8 +8,13 @@ export interface User {
   name: string
   email: string
   phone?: string
+  /** Profile photo URL or data URL; an empty string means the user removed their photo. */
   avatar?: string
   city?: string
+  /** Short introduction shown to tenants on the landlord card. */
+  bio?: string
+  /** WhatsApp number when it differs from `phone`. */
+  whatsapp?: string
   nationalId?: string
   status: 'active' | 'suspended' | 'pending'
   /** Identity check (national ID / passport) reviewed by an admin. Owners only; guests and admins leave this unset. */

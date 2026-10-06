@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
   Building2,
   Heart,
@@ -23,8 +23,10 @@ import { useCompare } from '../../context/CompareContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAsync } from '../../hooks/useAsync'
+import { useLogout } from '../../hooks/useLogout'
 import { useNotificationItems } from '../../hooks/useNotificationItems'
 import { chatService } from '../../services/chatService'
+import { PROFILE_PATH_BY_ROLE, UserMenu } from '../account/UserMenu'
 import { NotificationBell } from '../dashboard/NotificationBell'
 import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
@@ -96,11 +98,11 @@ function MenuLink({ to, icon: Icon, children }: { to: string; icon: LucideIcon; 
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
+  const handleLogout = useLogout()
   const { favoriteIds } = useFavorites()
   const { compareIds } = useCompare()
   const { t } = useLanguage()
-  const navigate = useNavigate()
   const location = useLocation()
   const { pathname } = location
   const { items: notifications, markAllRead } = useNotificationItems()
@@ -121,11 +123,6 @@ export function Navbar() {
   useEffect(() => {
     setDrawerOpen(false)
   }, [location.key])
-
-  function handleLogout() {
-    logout()
-    navigate('/')
-  }
 
   const tabs: MobileTab[] = [
     { to: '/', end: true, label: 'Home', icon: Home },
@@ -209,10 +206,7 @@ export function Navbar() {
                       </Button>
                     </Link>
                   )}
-                  <Avatar name={user.name} src={user.avatar} size="sm" />
-                  <Button variant="ghost" size="icon" aria-label={t('nav.logout')} title={t('nav.logout')} onClick={handleLogout}>
-                    <LogOut className="h-4 w-4" aria-hidden="true" />
-                  </Button>
+                  <UserMenu showName />
                 </div>
               ) : (
                 <div className="ml-2 flex items-center gap-2">
@@ -267,6 +261,11 @@ export function Navbar() {
           )}
 
           <nav className="flex flex-col gap-0.5" aria-label="Menu">
+            {user && (
+              <MenuLink to={PROFILE_PATH_BY_ROLE[user.role]} icon={UserRound}>
+                Profile & settings
+              </MenuLink>
+            )}
             {dashboardPath && (
               <MenuLink to={dashboardPath} icon={DashboardIcon}>
                 {dashboardLabel}
@@ -294,7 +293,12 @@ export function Navbar() {
           <PreferencesPanel className="border-t border-navy-700/10 pt-5 dark:border-navy-700" />
 
           {user && (
-            <Button variant="ghost" className="mt-auto w-full justify-start" icon={<LogOut className="h-4 w-4" />} onClick={handleLogout}>
+            <Button
+              variant="secondary"
+              className="w-full border-rose-500/30 text-rose-600 hover:border-rose-500 hover:text-rose-600 dark:text-rose-400"
+              icon={<LogOut className="h-4 w-4" />}
+              onClick={handleLogout}
+            >
               {t('nav.logout')}
             </Button>
           )}

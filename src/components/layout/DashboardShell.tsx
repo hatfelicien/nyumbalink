@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowUpRight, LogOut, Menu } from 'lucide-react'
-import { useAuth } from '../../context/AuthContext'
-import { Avatar } from '../ui/Avatar'
-import { Button } from '../ui/Button'
+import { Link, useLocation } from 'react-router-dom'
+import { ArrowUpRight, Menu } from 'lucide-react'
+import { useLogout } from '../../hooks/useLogout'
+import { UserMenu } from '../account/UserMenu'
 import { Drawer } from '../ui/Drawer'
 import { LanguageToggle } from './LanguageToggle'
 import type { MobileTab } from './MobileTabBar'
@@ -26,8 +25,7 @@ export interface DashboardShellProps {
 
 export function DashboardShell({ links, mobileTabs, title, children, headerExtra }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const handleLogout = useLogout()
   const location = useLocation()
   const { pathname } = location
 
@@ -37,11 +35,6 @@ export function DashboardShell({ links, mobileTabs, title, children, headerExtra
   useEffect(() => {
     setDrawerOpen(false)
   }, [location.key])
-
-  function handleLogout() {
-    logout()
-    navigate('/')
-  }
 
   const tabs: MobileTab[] = [...mobileTabs, { label: 'More', icon: Menu, onClick: () => setDrawerOpen(true) }]
 
@@ -92,10 +85,7 @@ export function DashboardShell({ links, mobileTabs, title, children, headerExtra
               <LanguageToggle />
               <ThemeToggle />
             </div>
-            {user && <Avatar name={user.name} src={user.avatar} size="sm" className="ml-1" />}
-            <Button variant="ghost" size="icon" aria-label="Log out" title="Log out" onClick={handleLogout} className="hidden lg:inline-flex">
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-            </Button>
+            <UserMenu showName className="ml-1" />
           </div>
         </header>
 

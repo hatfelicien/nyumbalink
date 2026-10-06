@@ -48,6 +48,7 @@ const LoginPage = lazy(() => import('./pages/public/LoginPage').then((m) => ({ d
 const MapSearchPage = lazy(() => import('./pages/public/MapSearchPage').then((m) => ({ default: m.MapSearchPage })))
 const MessagesPage = lazy(() => import('./pages/public/MessagesPage').then((m) => ({ default: m.MessagesPage })))
 const NotFoundPage = lazy(() => import('./pages/public/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
+const ProfilePage = lazy(() => import('./pages/public/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const PropertyDetailPage = lazy(() => import('./pages/public/PropertyDetailPage').then((m) => ({ default: m.PropertyDetailPage })))
 const RegisterPage = lazy(() => import('./pages/public/RegisterPage').then((m) => ({ default: m.RegisterPage })))
 const SavedListingsPage = lazy(() => import('./pages/public/SavedListingsPage').then((m) => ({ default: m.SavedListingsPage })))
@@ -82,6 +83,14 @@ function App() {
                     <Route path="map" element={<MapSearchPage />} />
                     <Route path="saved" element={<SavedListingsPage />} />
                     <Route path="compare" element={<ComparePage />} />
+                    <Route
+                      path="profile"
+                      element={
+                        <ProtectedRoute allowedRoles={['guest', 'owner', 'admin']}>
+                          <ProfilePage />
+                        </ProtectedRoute>
+                      }
+                    />
                     <Route
                       path="account"
                       element={
@@ -156,6 +165,7 @@ function App() {
                     <Route path="properties" element={<AdminPropertiesPage />} />
                     <Route path="users" element={<AdminUsersPage />} />
                     <Route path="settings" element={<AdminSettingsPage />} />
+                    <Route path="profile" element={<OwnerProfilePage />} />
                   </Route>
                 </Routes>
               </Suspense>

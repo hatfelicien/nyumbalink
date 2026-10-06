@@ -115,6 +115,15 @@ Every list has a loading skeleton, an empty state, and an error state with retry
   bar until the contact card scrolls into view
 - Framer Motion animations follow the operating system's reduced-motion setting
 
+**Account**
+- Your avatar opens an account menu (profile, dashboard or My rentals, messages, log out) on every
+  page and screen size; logging out confirms with a message and returns to the home page
+- **Profile & settings** (`/profile`, `/owner/profile`, `/admin/profile`): upload or remove a photo
+  (cropped to a square and shrunk before saving), edit name, email, Rwandan phone number (validated
+  and formatted, MTN or Airtel shown), a separate WhatsApp number, city, and for landlords an
+  "About you" note shown on their listings; plus appearance, language, data saver and password
+- Profile edits are kept in this browser and survive a reload, unlike the rest of the mock data
+
 **Comfort and polish**
 - Signing in survives a page refresh — your session is restored automatically
 - Save listings with the heart icon and revisit them from **Saved** in the navbar (works even
@@ -184,6 +193,8 @@ No component or page imports `src/data/` directly, so this is the only layer tha
   the in-app inbox is delivered. There is a web app manifest but no service worker, so no offline
   support or background push yet.
 - Signing an agreement records a typed name and timestamp; it is not a certified e-signature.
+- Changing your password validates the form but stores nothing, because there is no real
+  authentication yet (any password logs in).
 - Only the most visible public screens are translated. Dashboards are English, and the Kinyarwanda
   and French strings should be reviewed by native speakers before launch.
 - Rent collection, receipts and rent reminders are not built (only the existing mobile-money
