@@ -32,4 +32,8 @@ export const STORAGE_KEYS = {
   recentlyViewed: 'nyumbalink.recently-viewed',
   language: 'nyumbalink.language',
   theme: 'nyumbalink.theme',
+  compare: 'nyumbalink.compare',
+  savedSearches: 'nyumbalink.saved-searches',
+  dataSaver: 'nyumbalink.data-saver',
+  notificationPrefs: 'nyumbalink.notification-prefs',
 } as const

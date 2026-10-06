@@ -2,11 +2,13 @@ import { useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { GripVertical, Star, UploadCloud, X } from 'lucide-react'
+import { Input } from '../../ui/Input'
 import { cn } from '../../../utils/cn'
 import type { WizardValues } from './wizardSchema'
 
 export function StepPhotos({ form }: { form: UseFormReturn<WizardValues> }) {
   const {
+    register,
     watch,
     setValue,
     formState: { errors },
@@ -134,6 +136,14 @@ export function StepPhotos({ form }: { form: UseFormReturn<WizardValues> }) {
           ))}
         </div>
       )}
+
+      <Input
+        label="Video tour link (optional)"
+        placeholder="https://youtu.be/…"
+        {...register('videoUrl')}
+        error={errors.videoUrl?.message}
+        hint="A YouTube link or a direct .mp4 link. It only loads when a tenant presses play."
+      />
     </div>
   )
 }

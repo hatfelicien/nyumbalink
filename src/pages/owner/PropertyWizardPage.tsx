@@ -19,6 +19,8 @@ import { useAsync } from '../../hooks/useAsync'
 import { useToast } from '../../hooks/useToast'
 import { propertiesService } from '../../services/propertiesService'
 import type { Amenity, ListingStatus, Property, PropertyType } from '../../types'
+import { distanceKm } from '../../utils/constants'
+import { completeMonthlyCosts, findDuplicates } from '../../utils/verification'
 
 const STEP_COMPONENTS = [StepBasics, StepDetails, StepLocation, StepPhotos, StepReview]
 
@@ -38,6 +40,9 @@ function toWizardValues(property: Property): WizardValues {
     amenities: property.amenities,
     address: property.address,
     coordinates: property.coordinates,
+    locationPrecision: property.locationPrecision,
+    monthlyCosts: property.monthlyCosts,
+    videoUrl: property.videoUrl ?? '',
     images: property.images.map((url, index) => ({ url, isCover: index === 0 })),
   }
 }
@@ -90,35 +95,80 @@ export function PropertyWizardPage() {
     const values = form.getValues()
     const orderedImages = [...values.images].sort((a, b) => Number(b.isCover) - Number(a.isCover))
 
+    const isRent = values.purpose === 'rent'
+    const amenities = values.amenities as Amenity[]
+    const images = orderedImages.map((img) => img.url)
+    const type = values.type as PropertyType
+    const coordinates = { lat: values.coordinates.lat, lng: values.coordinates.lng }
+
+    // Publishing something that looks like another account's listing is held for an admin instead of going live.
+    let status = listingStatus
+    if (listingStatus === 'published') {
+      const others = await propertiesService.list()
+      const duplicates = findDuplicates(
+        { id, title: values.title, coordinates, type, bedrooms: values.bedrooms, ownerId: user!.id, images },
+        others,
+      ).filter((match) => match.property.ownerId !== user!.id)
+      if (duplicates.length > 0) status = 'pending'
+    }
+
+    // A verified badge covers a specific home: moving the pin or the address means it must be checked again.
+    const relocated =
+      !!existing && (existing.address !== values.address || distanceKm(existing.coordinates, coordinates) > 0.1)
+    const verification = existing && !relocated ? existing.verification : ('unverified' as const)
+
     const payload = {
       title: values.title,
       description: values.description,
       price: values.price,
-      type: values.type as PropertyType,
+      type,
       purpose: values.purpose,
       negotiable: values.negotiable,
-      cautionMoney: values.purpose === 'rent' ? values.cautionMoney : 0,
+      cautionMoney: isRent ? values.cautionMoney : 0,
       bedrooms: values.bedrooms,
       bathrooms: values.bathrooms,
       sizeSqm: values.sizeSqm,
       furnished: values.furnished,
-      amenities: values.amenities as Amenity[],
+      amenities,
       status: existing?.status ?? ('available' as const),
-      listingStatus,
-      images: orderedImages.map((img) => img.url),
+      listingStatus: status,
+      images,
+      videoUrl: values.videoUrl || undefined,
       address: values.address,
       city: 'Kigali',
       district: values.address,
-      coordinates: { lat: values.coordinates.lat, lng: values.coordinates.lng },
+      coordinates,
+      locationPrecision: values.locationPrecision,
+      monthlyCosts: completeMonthlyCosts(isRent ? values.monthlyCosts : {}),
+      verification,
+      verifiedAt: verification === 'verified' ? existing?.verifiedAt : undefined,
+      upi: verification === 'verified' ? existing?.upi : undefined,
       ownerId: user!.id,
     }
 
     if (isEditing && id) {
       await propertiesService.update(id, payload)
-      showToast('Property updated', { variant: 'success' })
     } else {
       await propertiesService.create(payload)
-      showToast(listingStatus === 'published' ? 'Property published' : 'Draft saved', { variant: 'success' })
+    }
+
+    if (status === 'pending' && listingStatus === 'published') {
+      showToast('Held for review', {
+        description: 'This looks very similar to an existing listing, so an admin will check it before it goes live.',
+        variant: 'warning',
+      })
+    } else if (existing?.verification === 'verified' && relocated) {
+      showToast('Property updated', {
+        description: 'The location changed, so the verified badge was removed. Submit the documents again under Verification.',
+        variant: 'warning',
+      })
+    } else if (isEditing) {
+      showToast('Property updated', { variant: 'success' })
+    } else {
+      showToast(listingStatus === 'published' ? 'Property published' : 'Draft saved', {
+        description: listingStatus === 'published' ? 'Next: verify it under Verification to earn the badge.' : undefined,
+        variant: 'success',
+      })
     }
 
     setSaving(false)

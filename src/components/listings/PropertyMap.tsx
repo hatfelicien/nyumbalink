@@ -1,11 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import type { Coordinates, Property } from '../../types'
 import { KIGALI_CENTER } from '../../utils/constants'
 import { formatRwf } from '../../utils/format'
 import { createLandmarkIcon, createPinIcon } from '../../utils/leafletIcons'
+import { publicCoordinates } from '../../utils/verification'
 
 export interface PropertyMapProps {
   properties: Property[]
@@ -44,9 +45,10 @@ export function PropertyMap({
   fitToMarkers = true,
   className,
 }: PropertyMapProps) {
-  const center = properties[0]
-    ? ([properties[0].coordinates.lat, properties[0].coordinates.lng] as [number, number])
-    : KIGALI_CENTER
+  // Approximate listings are drawn as an area, never as a pin on the gate.
+  const points = useMemo(() => properties.map((p) => ({ property: p, position: publicCoordinates(p) })), [properties])
+  const fitPoints = useMemo(() => points.map((p) => p.position), [points])
+  const center = points[0] ? ([points[0].position.lat, points[0].position.lng] as [number, number]) : KIGALI_CENTER
 
   return (
     <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} className={className}>
@@ -54,12 +56,24 @@ export function PropertyMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {fitToMarkers && <FitBounds points={properties.map((p) => p.coordinates)} />}
+      {fitToMarkers && <FitBounds points={fitPoints} />}
 
-      {properties.map((property) => (
+      {points.map(
+        ({ property, position }) =>
+          property.locationPrecision === 'approximate' && (
+            <Circle
+              key={`area-${property.id}`}
+              center={[position.lat, position.lng]}
+              radius={600}
+              pathOptions={{ color: '#2563EB', weight: 1, fillOpacity: 0.12 }}
+            />
+          ),
+      )}
+
+      {points.map(({ property, position }) => (
         <Marker
           key={property.id}
-          position={[property.coordinates.lat, property.coordinates.lng]}
+          position={[position.lat, position.lng]}
           icon={createPinIcon(property.id === selectedId)}
           eventHandlers={{
             click: () => onSelect?.(property.id),

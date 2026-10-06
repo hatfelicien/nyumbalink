@@ -28,7 +28,7 @@ export function ChatWindow({ thread, currentUserId, onMessageSent, className }: 
   const [messages, setMessages] = useState<ChatMessage[] | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -45,8 +45,10 @@ export function ChatWindow({ thread, currentUserId, onMessageSent, className }: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.thread.id, currentUserId])
 
+  // Scroll the message list itself — scrollIntoView would also scroll the page on phones.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const list = scrollRef.current
+    if (list) list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' })
   }, [messages?.length])
 
   async function handleSubmit(event: FormEvent) {
@@ -75,7 +77,7 @@ export function ChatWindow({ thread, currentUserId, onMessageSent, className }: 
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
         {messages === null ? (
           <div className="space-y-3">
             <Skeleton className="h-10 w-2/3" />
@@ -103,7 +105,6 @@ export function ChatWindow({ thread, currentUserId, onMessageSent, className }: 
             )
           })
         )}
-        <div ref={bottomRef} />
       </div>
 
       <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-navy-700/10 p-3 dark:border-navy-700">

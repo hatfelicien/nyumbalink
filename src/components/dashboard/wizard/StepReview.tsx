@@ -2,6 +2,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import { Badge } from '../../ui/Badge'
 import { AMENITIES, PROPERTY_TYPES } from '../../../utils/constants'
 import { formatRwf } from '../../../utils/format'
+import { totalMonthlyCosts } from '../../../utils/verification'
 import type { WizardValues } from './wizardSchema'
 
 export function StepReview({ form }: { form: UseFormReturn<WizardValues> }) {
@@ -33,6 +34,12 @@ export function StepReview({ form }: { form: UseFormReturn<WizardValues> }) {
             <p className="mt-2 text-sm text-slate-500">Caution money: {formatRwf(values.cautionMoney)}</p>
           )}
 
+          {values.purpose === 'rent' && (
+            <p className="mt-1 text-sm text-slate-500">
+              Estimated total per month: {formatRwf((values.price || 0) + totalMonthlyCosts(values.monthlyCosts))}
+            </p>
+          )}
+
           <p className="mt-3 text-sm leading-relaxed text-slate-500">{values.description}</p>
 
           <div className="mt-4 flex flex-wrap gap-4 text-sm text-navy-900 dark:text-white">
@@ -41,6 +48,7 @@ export function StepReview({ form }: { form: UseFormReturn<WizardValues> }) {
             <span>{values.bathrooms} bath</span>
             <span>{values.sizeSqm} m²</span>
             <span>{values.furnished ? 'Furnished' : 'Unfurnished'}</span>
+            <span>{values.locationPrecision === 'exact' ? 'Exact location shown' : 'General area shown'}</span>
           </div>
 
           {values.amenities.length > 0 && (
@@ -59,7 +67,8 @@ export function StepReview({ form }: { form: UseFormReturn<WizardValues> }) {
 
       <p className="text-sm text-slate-500">
         Review the details above, then publish to make this listing visible to tenants, or save it as a draft to
-        finish later.
+        finish later. After publishing, submit your ownership documents under Verification to earn the "Verified
+        property" badge.
       </p>
     </div>
   )

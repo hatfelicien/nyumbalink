@@ -14,28 +14,49 @@ const DEFAULT_FILTERS: FilterState = {
   furnished: null,
   amenities: [],
   status: null,
+  verifiedOnly: false,
   sort: 'newest',
+}
+
+/** Reads a browse-page query string into filters. Also used to re-run saved searches. */
+export function parseFilters(searchParams: URLSearchParams): FilterState {
+  const amenitiesParam = searchParams.get('amenities')
+  return {
+    location: searchParams.get('location') ?? DEFAULT_FILTERS.location,
+    priceMin: Number(searchParams.get('priceMin') ?? DEFAULT_FILTERS.priceMin),
+    priceMax: Number(searchParams.get('priceMax') ?? DEFAULT_FILTERS.priceMax),
+    bedrooms: searchParams.has('bedrooms') ? Number(searchParams.get('bedrooms')) : null,
+    bathrooms: searchParams.has('bathrooms') ? Number(searchParams.get('bathrooms')) : null,
+    type: (searchParams.get('type') as PropertyType | null) ?? null,
+    purpose: (searchParams.get('purpose') as ListingPurpose | null) ?? null,
+    furnished: searchParams.has('furnished') ? searchParams.get('furnished') === 'true' : null,
+    amenities: amenitiesParam ? (amenitiesParam.split(',') as Amenity[]) : [],
+    status: (searchParams.get('status') as PropertyStatus | null) ?? null,
+    verifiedOnly: searchParams.get('verifiedOnly') === 'true',
+    sort: (searchParams.get('sort') as FilterState['sort']) ?? DEFAULT_FILTERS.sort,
+  }
+}
+
+/** A short human label for a set of filters, used to name saved searches. */
+export function describeFilters(filters: FilterState) {
+  const parts: string[] = []
+  if (filters.purpose) parts.push(filters.purpose === 'sale' ? 'For sale' : 'For rent')
+  if (filters.type) parts.push(filters.type)
+  if (filters.bedrooms !== null) parts.push(`${filters.bedrooms}+ beds`)
+  if (filters.location) parts.push(filters.location)
+  if (filters.priceMax !== DEFAULT_FILTERS.priceMax && filters.purpose !== 'sale') {
+    parts.push(`up to ${Math.round(filters.priceMax / 1000)}k RWF`)
+  }
+  if (filters.furnished !== null) parts.push(filters.furnished ? 'furnished' : 'unfurnished')
+  if (filters.verifiedOnly) parts.push('verified')
+  parts.push(...filters.amenities)
+  return parts.length > 0 ? parts.join(' · ') : 'All listings'
 }
 
 export function useFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const filters = useMemo<FilterState>(() => {
-    const amenitiesParam = searchParams.get('amenities')
-    return {
-      location: searchParams.get('location') ?? DEFAULT_FILTERS.location,
-      priceMin: Number(searchParams.get('priceMin') ?? DEFAULT_FILTERS.priceMin),
-      priceMax: Number(searchParams.get('priceMax') ?? DEFAULT_FILTERS.priceMax),
-      bedrooms: searchParams.has('bedrooms') ? Number(searchParams.get('bedrooms')) : null,
-      bathrooms: searchParams.has('bathrooms') ? Number(searchParams.get('bathrooms')) : null,
-      type: (searchParams.get('type') as PropertyType | null) ?? null,
-      purpose: (searchParams.get('purpose') as ListingPurpose | null) ?? null,
-      furnished: searchParams.has('furnished') ? searchParams.get('furnished') === 'true' : null,
-      amenities: amenitiesParam ? (amenitiesParam.split(',') as Amenity[]) : [],
-      status: (searchParams.get('status') as PropertyStatus | null) ?? null,
-      sort: (searchParams.get('sort') as FilterState['sort']) ?? DEFAULT_FILTERS.sort,
-    }
-  }, [searchParams])
+  const filters = useMemo<FilterState>(() => parseFilters(searchParams), [searchParams])
 
   function applyFilterEntry<K extends keyof FilterState>(params: URLSearchParams, key: K, value: FilterState[K]) {
     const isDefault = JSON.stringify(value) === JSON.stringify(DEFAULT_FILTERS[key])

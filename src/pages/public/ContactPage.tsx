@@ -40,8 +40,8 @@ export function ContactPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold text-navy-900 dark:text-white sm:text-4xl">Get in touch</h1>
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+      <h1 className="text-[1.75rem] font-semibold leading-tight text-navy-900 dark:text-white sm:text-4xl">Get in touch</h1>
       <p className="mt-3 max-w-xl text-slate-500">
         Questions about a listing, your account, or partnering with us? Send a message or visit our office in
         Kigali Heights.

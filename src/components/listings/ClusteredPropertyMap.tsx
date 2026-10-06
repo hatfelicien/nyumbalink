@@ -5,6 +5,7 @@ import 'leaflet.markercluster'
 import type { Property } from '../../types'
 import { KIGALI_CENTER } from '../../utils/constants'
 import { createPinIcon } from '../../utils/leafletIcons'
+import { publicCoordinates } from '../../utils/verification'
 
 export interface ClusteredPropertyMapProps {
   properties: Property[]
@@ -27,7 +28,8 @@ function ClusterLayer({ properties, selectedId, onSelect }: ClusteredPropertyMap
     const markers = new Map<string, L.Marker>()
 
     properties.forEach((property) => {
-      const marker = L.marker([property.coordinates.lat, property.coordinates.lng], {
+      const position = publicCoordinates(property)
+      const marker = L.marker([position.lat, position.lng], {
         icon: createPinIcon(property.id === selectedId),
       })
       marker.on('click', () => onSelect(property.id))

@@ -19,7 +19,7 @@ export function Tabs({ items, value, onChange, className }: TabsProps) {
   const layoutId = useId()
 
   return (
-    <div role="tablist" className={cn('flex items-center gap-1 border-b border-navy-700/10 dark:border-navy-700', className)}>
+    <div role="tablist" className={cn('flex items-center gap-1 overflow-x-auto border-b border-navy-700/10 scrollbar-none dark:border-navy-700', className)}>
       {items.map((item) => {
         const active = item.value === value
         return (
@@ -31,7 +31,7 @@ export function Tabs({ items, value, onChange, className }: TabsProps) {
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(item.value)}
             className={cn(
-              'relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors',
+              'relative flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors sm:px-4',
               active ? 'text-blue-500' : 'text-slate-500 hover:text-navy-900 dark:hover:text-white',
             )}
           >
@@ -42,7 +42,7 @@ export function Tabs({ items, value, onChange, className }: TabsProps) {
             {active && (
               <motion.span
                 layoutId={`tabs-indicator-${layoutId}`}
-                className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-blue-500"
+                className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-blue-500"
                 transition={{ type: 'spring', stiffness: 500, damping: 40 }}
               />
             )}

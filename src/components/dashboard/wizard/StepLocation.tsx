@@ -4,6 +4,7 @@ import type { LeafletEvent, Marker as LeafletMarker } from 'leaflet'
 import { LocateFixed } from 'lucide-react'
 import { Input } from '../../ui/Input'
 import { useReverseGeocode } from '../../../hooks/useReverseGeocode'
+import { cn } from '../../../utils/cn'
 import { createPinIcon } from '../../../utils/leafletIcons'
 import type { WizardValues } from './wizardSchema'
 
@@ -26,6 +27,7 @@ export function StepLocation({ form }: { form: UseFormReturn<WizardValues> }) {
 
   const lat = watch('coordinates.lat')
   const lng = watch('coordinates.lng')
+  const precision = watch('locationPrecision')
   const coordinates = { lat, lng }
   const { address, loading } = useReverseGeocode(coordinates)
 
@@ -60,6 +62,34 @@ export function StepLocation({ form }: { form: UseFormReturn<WizardValues> }) {
               }}
             />
           </MapContainer>
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-1.5 text-sm font-medium text-navy-900 dark:text-white">What tenants see on the map</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {(
+            [
+              { value: 'exact', label: 'Exact location', description: 'The pin sits on the property.' },
+              { value: 'approximate', label: 'General area', description: 'A ~1 km area until you confirm a viewing.' },
+            ] as const
+          ).map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setValue('locationPrecision', option.value)}
+              aria-pressed={precision === option.value}
+              className={cn(
+                'rounded-lg border px-3.5 py-2.5 text-left transition-colors',
+                precision === option.value
+                  ? 'border-blue-500 bg-blue-500/10'
+                  : 'border-navy-700/15 hover:border-blue-400 dark:border-navy-700',
+              )}
+            >
+              <p className="text-sm font-medium text-navy-900 dark:text-white">{option.label}</p>
+              <p className="text-xs text-slate-500">{option.description}</p>
+            </button>
+          ))}
         </div>
       </div>
 

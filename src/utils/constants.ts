@@ -1,4 +1,4 @@
-import { Car, Droplets, Fan, Fuel, Shield, Trees, Wifi } from 'lucide-react'
+import { Car, Container, Droplets, Fan, Fuel, Shield, Trees, Wifi, Zap } from 'lucide-react'
 import type { Amenity, ListingPurpose, PaymentMethod, PropertyType } from '../types'
 
 export const PRICE_MIN = 0
@@ -26,9 +26,11 @@ export const PAYMENT_METHODS: { value: PaymentMethod; label: string; color: stri
 ]
 
 export const AMENITIES: { value: Amenity; label: string; icon: typeof Wifi }[] = [
-  { value: 'wifi', label: 'Wifi', icon: Wifi },
+  { value: 'piped water', label: 'WASAC water', icon: Droplets },
+  { value: 'cash power', label: 'Cash power', icon: Zap },
+  { value: 'wifi', label: 'Internet', icon: Wifi },
   { value: 'parking', label: 'Parking', icon: Car },
-  { value: 'water tank', label: 'Water tank', icon: Droplets },
+  { value: 'water tank', label: 'Water tank', icon: Container },
   { value: 'security', label: 'Security', icon: Shield },
   { value: 'generator', label: 'Generator', icon: Fuel },
   { value: 'garden', label: 'Garden', icon: Trees },

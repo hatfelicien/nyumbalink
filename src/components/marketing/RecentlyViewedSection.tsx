@@ -24,7 +24,7 @@ export function RecentlyViewedSection() {
         <h2 className="text-2xl font-semibold text-navy-900 dark:text-white">Recently viewed</h2>
       </div>
 
-      <div className="mt-6 flex snap-x gap-5 overflow-x-auto pb-2">
+      <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:gap-5 sm:px-0">
         {recent.map((property, index) => (
           <motion.div
             key={property.id}
@@ -32,7 +32,7 @@ export function RecentlyViewedSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: index * 0.06 }}
-            className="w-72 shrink-0 snap-start"
+            className="w-[78%] max-w-[18rem] shrink-0 snap-start sm:w-72"
           >
             <PropertyCard property={property} />
           </motion.div>

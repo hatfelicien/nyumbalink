@@ -29,7 +29,8 @@ export function ToastViewport({ toasts, onDismiss }: ToastViewportProps) {
     <div
       role="region"
       aria-label="Notifications"
-      className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-3"
+      // Phones: full-width, just below the header so the tab bar and sticky actions stay clear.
+      className="pointer-events-none fixed inset-x-4 top-[calc(3.5rem+env(safe-area-inset-top)+0.5rem)] z-[60] flex flex-col gap-3 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-auto sm:w-full sm:max-w-sm"
     >
       <AnimatePresence>
         {toasts.map((toast) => {
@@ -39,9 +40,9 @@ export function ToastViewport({ toasts, onDismiss }: ToastViewportProps) {
               key={toast.id}
               role="status"
               layout
-              initial={{ opacity: 0, y: 40, x: 20 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              exit={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, scale: 0.94 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 400, damping: 32 }}
               className="pointer-events-auto flex items-start gap-3 rounded-xl border border-navy-700/10 bg-white p-4 shadow-soft dark:border-navy-700 dark:bg-navy-800"
             >

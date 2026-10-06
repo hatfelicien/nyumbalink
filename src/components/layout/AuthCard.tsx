@@ -11,7 +11,7 @@ export interface AuthCardProps {
 
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center px-4 py-12">
+    <div className="mx-auto flex min-h-[calc(100dvh-8rem)] md:min-h-[calc(100dvh-4rem)] max-w-md flex-col justify-center px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <Card>
           <h1 className="text-2xl font-semibold text-navy-900 dark:text-white">{title}</h1>

@@ -16,6 +16,7 @@ export function filterProperties(properties: Property[], filters: FilterState): 
     if (filters.purpose !== null && property.purpose !== filters.purpose) return false
     if (filters.furnished !== null && property.furnished !== filters.furnished) return false
     if (filters.status !== null && property.status !== filters.status) return false
+    if (filters.verifiedOnly && property.verification !== 'verified') return false
     if (filters.amenities.length > 0 && !filters.amenities.every((a) => property.amenities.includes(a))) {
       return false
     }

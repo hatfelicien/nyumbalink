@@ -1,6 +1,7 @@
 import { Avatar } from '../ui/Avatar'
 import { Badge } from '../ui/Badge'
 import { Modal } from '../ui/Modal'
+import { VerificationBadge } from '../trust/VerificationBadge'
 import type { User } from '../../types'
 import { formatDate } from '../../utils/format'
 
@@ -15,9 +16,14 @@ export function ViewUserModal({ user, onClose }: { user: User | null; onClose: (
             <Avatar name={user.name} src={user.avatar} size="lg" />
             <div>
               <p className="font-semibold text-navy-900 dark:text-white">{user.name}</p>
-              <Badge variant={STATUS_VARIANT[user.status]} className="mt-1 capitalize">
-                {user.status}
-              </Badge>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                <Badge variant={STATUS_VARIANT[user.status]} className="capitalize">
+                  {user.status}
+                </Badge>
+                {user.role === 'owner' && (
+                  <VerificationBadge kind="landlord" status={user.verification ?? 'unverified'} showUnverified />
+                )}
+              </div>
             </div>
           </div>
           <dl className="space-y-2 text-sm">

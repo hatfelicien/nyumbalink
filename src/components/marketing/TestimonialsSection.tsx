@@ -8,7 +8,7 @@ const itemVariants = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 }
 
 export function TestimonialsSection() {
   return (
-    <section className="bg-navy-900 py-20">
+    <section className="bg-navy-900 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-semibold text-white">Loved by tenants and owners</h2>
@@ -20,13 +20,13 @@ export function TestimonialsSection() {
           whileInView="show"
           viewport={{ once: true, amount: 0.3 }}
           variants={containerVariants}
-          className="mt-12 grid gap-6 md:grid-cols-3"
+          className="-mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mt-12 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0"
         >
           {testimonials.map((testimonial) => (
             <motion.figure
               key={testimonial.id}
               variants={itemVariants}
-              className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-6"
+              className="flex w-[85%] shrink-0 snap-center flex-col rounded-2xl border border-white/10 bg-white/5 p-6 md:w-auto"
             >
               <Quote className="h-6 w-6 text-blue-400" aria-hidden="true" />
               <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-white/80">

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell } from 'lucide-react'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -10,29 +10,53 @@ export interface NotificationItem {
   title: string
   subtitle: string
   time: string
+  href?: string
+  /** Defaults to true — every item counts towards the unread dot. */
+  unread?: boolean
 }
 
 export interface NotificationBellProps {
   items: NotificationItem[]
   viewAllHref: string
   emptyLabel: string
+  /** Called each time the panel is opened, e.g. to mark the items as read. */
+  onOpen?: () => void
 }
 
-export function NotificationBell({ items, viewAllHref, emptyLabel }: NotificationBellProps) {
+export function NotificationBell({ items, viewAllHref, emptyLabel, onOpen }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
+  const location = useLocation()
+
+  // Links inside close the panel after the navigation commits (see the menu drawers in Navbar).
+  useEffect(() => {
+    setOpen(false)
+  }, [location.key])
+
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+  const hasUnread = items.some((item) => item.unread !== false)
+
+  function toggle() {
+    if (!open) onOpen?.()
+    setOpen((o) => !o)
+  }
   const containerRef = useFocusTrap<HTMLDivElement>(open)
 
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         aria-label="Notifications"
         aria-expanded={open}
         className="relative flex h-10 w-10 items-center justify-center rounded-full text-navy-900 transition-colors hover:bg-navy-900/5 dark:text-white dark:hover:bg-white/10"
       >
         <Bell className="h-[18px] w-[18px]" aria-hidden="true" />
-        {items.length > 0 && (
+        {hasUnread && (
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500" aria-hidden="true" />
         )}
       </button>
@@ -55,7 +79,7 @@ export function NotificationBell({ items, viewAllHref, emptyLabel }: Notificatio
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.97 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-navy-700/10 bg-white shadow-soft dark:border-navy-700 dark:bg-navy-800"
+              className="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-navy-700/10 bg-white shadow-soft dark:border-navy-700 dark:bg-navy-800"
             >
               <div className="border-b border-navy-700/10 px-4 py-3 dark:border-navy-700">
                 <p className="text-sm font-semibold text-navy-900 dark:text-white">Notifications</p>
@@ -67,7 +91,16 @@ export function NotificationBell({ items, viewAllHref, emptyLabel }: Notificatio
                   <ul className="divide-y divide-navy-700/10 dark:divide-navy-700">
                     {items.map((item) => (
                       <li key={item.id} className="px-4 py-3">
-                        <p className="text-sm font-medium text-navy-900 dark:text-white">{item.title}</p>
+                        {item.href ? (
+                          <Link
+                            to={item.href}
+                            className="text-sm font-medium text-navy-900 hover:text-blue-500 dark:text-white"
+                          >
+                            {item.title}
+                          </Link>
+                        ) : (
+                          <p className="text-sm font-medium text-navy-900 dark:text-white">{item.title}</p>
+                        )}
                         <p className="mt-0.5 line-clamp-1 text-sm text-slate-500">{item.subtitle}</p>
                         <p className="mt-0.5 text-xs text-slate-500">{item.time}</p>
                       </li>
@@ -77,7 +110,6 @@ export function NotificationBell({ items, viewAllHref, emptyLabel }: Notificatio
               </div>
               <Link
                 to={viewAllHref}
-                onClick={() => setOpen(false)}
                 className="block border-t border-navy-700/10 px-4 py-3 text-center text-sm font-medium text-blue-500 hover:text-blue-400 dark:border-navy-700"
               >
                 View all

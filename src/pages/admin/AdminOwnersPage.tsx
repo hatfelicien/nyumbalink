@@ -3,6 +3,7 @@ import { Ban, CheckCircle2, Eye, Pencil, Plus, Search, ShieldCheck, ShieldOff, T
 import { OwnerFormModal } from '../../components/dashboard/OwnerFormModal'
 import type { OwnerFormValues } from '../../components/dashboard/OwnerFormModal'
 import { ViewUserModal } from '../../components/dashboard/ViewUserModal'
+import { VerificationBadge } from '../../components/trust/VerificationBadge'
 import { Avatar } from '../../components/ui/Avatar'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
@@ -83,8 +84,12 @@ export function AdminOwnersPage() {
 
   async function toggleVerified(owner: User) {
     setBusyId(owner.id)
-    await usersService.update(owner.id, { verified: !owner.verified })
-    showToast(owner.verified ? 'Verification removed' : 'Owner verified', { variant: 'success' })
+    const verified = owner.verification === 'verified'
+    await usersService.update(owner.id, {
+      verification: verified ? 'unverified' : 'verified',
+      verifiedAt: verified ? undefined : new Date().toISOString(),
+    })
+    showToast(verified ? 'Verification removed' : 'Owner verified', { variant: 'success' })
     setBusyId(null)
     reload()
   }
@@ -128,15 +133,7 @@ export function AdminOwnersPage() {
     {
       key: 'verified',
       header: 'Verified',
-      render: (row) =>
-        row.verified ? (
-          <Badge variant="brand" className="gap-1">
-            <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-            Verified
-          </Badge>
-        ) : (
-          <Badge variant="neutral">Unverified</Badge>
-        ),
+      render: (row) => <VerificationBadge kind="landlord" status={row.verification ?? 'unverified'} showUnverified />,
     },
     { key: 'createdAt', header: 'Joined', sortable: true, sortValue: (row) => row.createdAt, render: (row) => formatDate(row.createdAt) },
     {
@@ -171,11 +168,11 @@ export function AdminOwnersPage() {
           <Button
             variant="ghost"
             size="icon"
-            aria-label={row.verified ? 'Remove verification' : 'Verify owner'}
+            aria-label={row.verification === 'verified' ? 'Remove verification' : 'Verify owner'}
             disabled={busyId === row.id}
             onClick={() => toggleVerified(row)}
           >
-            {row.verified ? <ShieldOff className="h-4 w-4 text-slate-500" /> : <ShieldCheck className="h-4 w-4 text-blue-500" />}
+            {row.verification === 'verified' ? <ShieldOff className="h-4 w-4 text-slate-500" /> : <ShieldCheck className="h-4 w-4 text-blue-500" />}
           </Button>
           <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => setDeleteTarget(row)}>
             <Trash2 className="h-4 w-4 text-rose-500" />
@@ -188,15 +185,16 @@ export function AdminOwnersPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-1 flex-wrap gap-3">
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row">
           <Input
             placeholder="Search by name or email"
+            aria-label="Search by name or email"
             leftIcon={<Search className="h-4 w-4" />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="max-w-xs"
+            containerClassName="sm:max-w-xs"
           />
-          <Select options={STATUS_FILTERS} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-44" />
+          <Select aria-label="Filter by status" options={STATUS_FILTERS} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="sm:w-48" />
         </div>
         <Button
           icon={<Plus className="h-4 w-4" />}

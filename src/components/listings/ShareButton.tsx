@@ -1,5 +1,4 @@
 import { Share2 } from 'lucide-react'
-import { Button } from '../ui/Button'
 import { useToast } from '../../hooks/useToast'
 
 export function ShareButton({ title }: { title: string }) {
@@ -26,8 +25,13 @@ export function ShareButton({ title }: { title: string }) {
   }
 
   return (
-    <Button variant="secondary" size="sm" icon={<Share2 className="h-4 w-4" />} onClick={handleShare}>
+    <button
+      type="button"
+      onClick={handleShare}
+      className="flex h-10 items-center gap-1.5 rounded-full border border-navy-700/15 px-4 text-sm font-medium text-navy-900 transition-colors hover:border-blue-400 hover:text-blue-500 active:scale-95 dark:border-navy-700 dark:text-white"
+    >
+      <Share2 className="h-4 w-4" aria-hidden="true" />
       Share
-    </Button>
+    </button>
   )
 }

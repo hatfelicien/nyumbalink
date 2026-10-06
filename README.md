@@ -52,6 +52,37 @@ that role. Any password is accepted for a known email; there is no real authenti
   "become an owner" application form
 - Static pages: about, contact (with map), terms, 404, 403
 
+**Trust and verification**
+- Two independent checks, each with its own badge: **Verified landlord** (national ID or passport
+  plus a selfie) and **Verified property** (land title UPI plus the title, lease, or a notarised
+  authorisation letter when managing for the title holder). A listing with both shows as
+  **Fully verified**
+- Landlords submit documents under **Owner → Verification**; admins decide in
+  **Admin → Verification**, where each request arrives with automatic pre-checks (ID and UPI format,
+  ID or parcel already used by another account, missing documents, duplicate listing). Approving is
+  what grants the badge; rejecting requires a reason the landlord sees
+- Moving a verified listing's pin or address removes its badge until it is checked again
+- Listing pages spell out which checks passed, carry safety tips, and have **Report this listing**.
+  Three different reporters hide a listing automatically until an admin reviews it
+- Duplicate-listing detection (same title, or same location/type/size under another account) holds
+  a new listing for review instead of publishing it, and flags existing ones in **Admin → All properties**
+- Reviews can only be written by someone who rented or completed a viewing through the platform,
+  one per person, and nothing is public until a moderator approves it
+
+**The rental journey (Find → Verify → Visit → Apply → Sign → Manage)**
+- Filters for verified-only, WASAC water, cash power and internet; saved searches with a "new
+  matches" badge; side-by-side comparison of up to three homes
+- Listings show an estimated total monthly cost (rent plus water, electricity, internet, umutekano
+  and isuku), an optional click-to-play video tour, and either the exact pin or a general area that
+  unlocks once a viewing is confirmed
+- Viewing requests, online rental applications, and a rental agreement both sides sign by typing
+  their name (printable / save as PDF). The tenant's signature marks the listing as rented
+- Tenants track everything under **My rentals** and report repairs against an active tenancy;
+  landlords get Viewings, Applications, Tenants & contracts and Maintenance pages
+- Disputes can be opened from an agreement and are resolved in **Admin → Reports & disputes**
+- English, Kinyarwanda and French (the toggle cycles through all three)
+- A data-saver mode (on automatically for `Save-Data` / 2G connections) requests smaller photos
+
 **Owner dashboard**
 - Overview with stat cards and a views-over-time chart
 - Properties list with publish/unpublish, edit, and delete (with confirmation)
@@ -72,6 +103,18 @@ that role. Any password is accepted for a known email; there is no real authenti
 Every list has a loading skeleton, an empty state, and an error state with retry. Forms use
 `react-hook-form` + `zod`, with inline validation and a disabled/spinner submit state.
 
+**Responsive layout**
+- Phones get an app-style bottom tab bar (Home, Explore, Map or Messages, Saved, and your account),
+  a slim top bar, and a menu sheet with appearance, language and data-saver settings. Dashboards
+  get their own tab bar with a "More" tab for the full menu. Tablets and desktops keep the top
+  navigation and sidebar
+- Dialogs become bottom sheets on phones; tables turn into card grids below 1280px wide
+- Browse docks the map beside the results from 1440px wide and uses a list/map toggle below that
+  (a floating button on phones); filters open as a sheet with a "Show N homes" button
+- Listing pages use a swipeable photo carousel on phones and keep "Schedule a viewing" in a sticky
+  bar until the contact card scrolls into view
+- Framer Motion animations follow the operating system's reduced-motion setting
+
 **Comfort and polish**
 - Signing in survives a page refresh — your session is restored automatically
 - Save listings with the heart icon and revisit them from **Saved** in the navbar (works even
@@ -83,7 +126,7 @@ Every list has a loading skeleton, an empty state, and an error state with retry
   **Share** button copies the listing link (or opens the native share sheet on mobile)
 - Routes scroll to top on navigation, and a "Skip to content" link appears on first Tab press
 - Theme always starts in light mode; toggling it manually persists your choice for next time
-- A Kinyarwanda / English language toggle sits next to the theme toggle and persists too
+- A language toggle sits next to the theme toggle and persists too
 
 ## Tech stack
 
@@ -133,7 +176,20 @@ No component or page imports `src/data/` directly, so this is the only layer tha
 
 ## Known limitations
 
-- This is a demo dataset: 24 listings, 10 users, and a handful of enquiries/reviews/applications.
+- **Verification documents are not stored or checked against any registry.** Uploads are object
+  URLs like listing photos, and the pre-checks validate formats and duplicates only. A real
+  deployment needs private file storage and a reviewer process (or an integration) that confirms
+  IDs and land titles with the issuing authorities.
+- **SMS and push are not sent.** Notifications record which channels they should go to, and only
+  the in-app inbox is delivered. There is a web app manifest but no service worker, so no offline
+  support or background push yet.
+- Signing an agreement records a typed name and timestamp; it is not a certified e-signature.
+- Only the most visible public screens are translated. Dashboards are English, and the Kinyarwanda
+  and French strings should be reviewed by native speakers before launch.
+- Rent collection, receipts and rent reminders are not built (only the existing mobile-money
+  deposit prompt exists).
+
+- This is a demo dataset: 25 listings, 10 users, and a handful of records for every other feature.
 - Photo uploads use `URL.createObjectURL` — nothing is actually persisted, and object URLs are
   lost on refresh.
 - Your logged-in session, saved listings, recently-viewed list, theme choice, and language

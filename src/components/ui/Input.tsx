@@ -8,16 +8,18 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string
   leftIcon?: ReactNode
   rightIcon?: ReactNode
+  /** Classes for the outer wrapper (label + field), e.g. to cap its width in a toolbar. */
+  containerClassName?: string
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, leftIcon, rightIcon, id, ...props }, ref) => {
+  ({ className, containerClassName, label, error, hint, leftIcon, rightIcon, id, ...props }, ref) => {
     const generatedId = useId()
     const inputId = id ?? generatedId
     const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
 
     return (
-      <div className="w-full">
+      <div className={cn('w-full', containerClassName)}>
         {label && (
           <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-navy-900 dark:text-white">
             {label}

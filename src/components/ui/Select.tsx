@@ -13,15 +13,17 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   error?: string
   options: SelectOption[]
   placeholder?: string
+  /** Classes for the <select> itself; `className` sizes the wrapper so the chevron stays aligned. */
+  selectClassName?: string
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, placeholder, id, ...props }, ref) => {
+  ({ className, selectClassName, label, error, options, placeholder, id, ...props }, ref) => {
     const generatedId = useId()
     const selectId = id ?? generatedId
 
     return (
-      <div className="w-full">
+      <div className={cn('w-full', className)}>
         {label && (
           <label htmlFor={selectId} className="mb-1.5 block text-sm font-medium text-navy-900 dark:text-white">
             {label}
@@ -35,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className={cn(
               'h-11 w-full appearance-none rounded-xl border border-navy-700/15 bg-white px-4 pr-10 text-sm text-navy-900 transition-colors focus-visible:border-blue-400 dark:border-navy-700 dark:bg-navy-800 dark:text-white',
               error && 'border-rose-500 focus-visible:ring-rose-500',
-              className,
+              selectClassName,
             )}
             {...props}
           >

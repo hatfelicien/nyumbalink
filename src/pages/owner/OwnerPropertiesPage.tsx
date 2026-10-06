@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CalendarClock, Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { VerificationBadge } from '../../components/trust/VerificationBadge'
 import { AvailabilityModal } from '../../components/dashboard/AvailabilityModal'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
@@ -102,6 +103,18 @@ export function OwnerPropertiesPage() {
           {row.listingStatus}
         </Badge>
       ),
+    },
+    {
+      key: 'verification',
+      header: 'Verification',
+      render: (row) =>
+        row.verification === 'verified' || row.verification === 'pending' ? (
+          <VerificationBadge kind="property" status={row.verification} showUnverified />
+        ) : (
+          <Link to="/owner/verification" className="text-sm font-medium text-blue-500 hover:text-blue-400">
+            {row.verification === 'rejected' ? 'Resubmit documents' : 'Verify now'}
+          </Link>
+        ),
     },
     {
       key: 'views',

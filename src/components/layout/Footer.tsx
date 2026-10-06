@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Facebook, Instagram, Twitter } from 'lucide-react'
+import { useDataSaver } from '../../context/DataSaverContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { Logo } from './Logo'
 
@@ -9,6 +10,7 @@ const COLUMNS = [
     links: [
       { to: '/browse', label: 'Browse listings' },
       { to: '/map', label: 'Map search' },
+      { to: '/compare', label: 'Compare homes' },
       { to: '/become-an-owner', label: 'Become an owner' },
     ],
   },
@@ -31,20 +33,25 @@ const COLUMNS = [
 
 export function Footer() {
   const { t } = useLanguage()
+  const { dataSaver, setDataSaver } = useDataSaver()
 
   return (
-    <footer className="border-t border-navy-700 bg-navy-900 text-white">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
+    <footer className="border-t border-navy-700 bg-navy-900 text-white print:hidden">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="col-span-2 sm:col-span-3 md:col-span-1">
             <Logo inverted />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">{t('footer.tagline')}</p>
             <div className="mt-5 flex gap-3">
-              {[Facebook, Instagram, Twitter].map((Icon, index) => (
+              {[
+                { icon: Facebook, label: 'NyumbaLink on Facebook' },
+                { icon: Instagram, label: 'NyumbaLink on Instagram' },
+                { icon: Twitter, label: 'NyumbaLink on X' },
+              ].map(({ icon: Icon, label }) => (
                 <a
-                  key={index}
+                  key={label}
                   href="#"
-                  aria-label="Social link"
+                  aria-label={label}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-blue-500 hover:text-white"
                 >
                   <Icon className="h-4 w-4" aria-hidden="true" />
@@ -71,6 +78,14 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} NyumbaLink. {t('footer.rights')}</p>
+          <button
+            type="button"
+            onClick={() => setDataSaver(!dataSaver)}
+            aria-pressed={dataSaver}
+            className="text-left underline-offset-4 hover:text-white hover:underline"
+          >
+            Data saver: {dataSaver ? 'on' : 'off'}
+          </button>
           <p>{t('footer.madeFor')}</p>
         </div>
       </div>

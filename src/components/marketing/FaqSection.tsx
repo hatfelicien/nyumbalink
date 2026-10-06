@@ -10,7 +10,7 @@ const FAQS = [
   {
     question: 'How do I know a listing is genuine?',
     answer:
-      'Owners go through an application review before they can publish listings, and every listing shows an exact map pin so you can verify the location before visiting.',
+      'Look for the badges. "Verified landlord" means our team checked the owner’s national ID; "Verified property" means we matched the land title to the listing. Anyone can report a listing, and repeated reports hide it until it is reviewed.',
   },
   {
     question: 'Can I list more than one property?',
@@ -18,7 +18,8 @@ const FAQS = [
   },
   {
     question: 'Do prices include utilities?',
-    answer: 'This varies by listing. Always confirm what is included directly with the owner before agreeing to a lease.',
+    answer:
+      'Every rental listing shows an estimated total per month — rent plus water, cash power, internet, umutekano and isuku — so you can compare the real cost. Confirm the details with the landlord before signing.',
   },
 ]
 
@@ -26,12 +27,12 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <div className="text-center">
         <h2 className="text-3xl font-semibold text-navy-900 dark:text-white">Frequently asked questions</h2>
       </div>
 
-      <div className="mt-10 divide-y divide-navy-700/10 rounded-2xl border border-navy-700/10 dark:divide-navy-700 dark:border-navy-700">
+      <div className="mt-10 divide-y divide-navy-700/10 overflow-hidden rounded-2xl border border-navy-700/10 bg-white dark:divide-navy-700 dark:border-navy-700 dark:bg-navy-800">
         {FAQS.map((faq, index) => {
           const open = openIndex === index
           return (
@@ -40,7 +41,7 @@ export function FaqSection() {
                 type="button"
                 onClick={() => setOpenIndex(open ? null : index)}
                 aria-expanded={open}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-navy-900/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <span className="text-sm font-medium text-navy-900 dark:text-white">{faq.question}</span>
                 <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>

@@ -18,7 +18,8 @@ export function AnimatedOutlet() {
   // page stuck rendering its `exit` state (opacity 0) instead of transitioning in.
   return (
     <motion.div
-      key={location.key}
+      // Keyed by path, not location.key, so filter/query-string changes do not replay the page entrance.
+      key={location.pathname}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}

@@ -4,6 +4,7 @@ import { BedDouble, Maximize, ShowerHead, X } from 'lucide-react'
 import type { Property } from '../../types'
 import { Badge } from '../ui/Badge'
 import { Rating } from '../ui/Rating'
+import { VerificationBadge } from '../trust/VerificationBadge'
 import { FavoriteButton } from './FavoriteButton'
 import { formatRwf } from '../../utils/format'
 
@@ -46,6 +47,7 @@ export function PropertySlideCard({ property, onClose }: PropertySlideCardProps)
               </Badge>
             </div>
             <p className="line-clamp-1 text-sm font-medium text-navy-900 dark:text-white">{property.title}</p>
+            <VerificationBadge kind="property" status={property.verification} showUnverified />
             <div className="flex items-center gap-4 text-sm text-slate-500">
               <span className="flex items-center gap-1">
                 <BedDouble className="h-3.5 w-3.5" aria-hidden="true" />

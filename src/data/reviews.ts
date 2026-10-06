@@ -4,17 +4,21 @@ export const reviews: Review[] = [
   {
     id: 'review-1',
     propertyId: 'property-1',
+    verifiedTenant: true,
     authorName: 'Claudine M.',
     rating: 5,
     comment: 'Very responsive landlord and the apartment was exactly as pictured. Loved the balcony view.',
+    status: 'published',
     createdAt: '2026-06-20T10:00:00.000Z',
   },
   {
     id: 'review-2',
     propertyId: 'property-1',
+    verifiedTenant: true,
     authorName: 'Fabrice K.',
     rating: 4,
     comment: 'Good value for the location. Generator kicked in quickly during the last outage.',
+    status: 'published',
     createdAt: '2026-07-02T10:00:00.000Z',
   },
   {
@@ -23,6 +27,7 @@ export const reviews: Review[] = [
     authorName: 'Aisha N.',
     rating: 5,
     comment: 'Stunning villa, the garden is beautifully maintained and security is excellent.',
+    status: 'published',
     createdAt: '2026-03-01T10:00:00.000Z',
   },
   {
@@ -31,6 +36,7 @@ export const reviews: Review[] = [
     authorName: 'Thierry B.',
     rating: 5,
     comment: 'Worth every franc. The pool terrace and backup power made the rainy season a non-issue.',
+    status: 'published',
     createdAt: '2026-02-10T10:00:00.000Z',
   },
   {
@@ -39,6 +45,7 @@ export const reviews: Review[] = [
     authorName: 'Marie C.',
     rating: 4,
     comment: 'Great house overall, though the compound gate could use a smoother motor.',
+    status: 'published',
     createdAt: '2026-03-05T10:00:00.000Z',
   },
   {
@@ -47,6 +54,7 @@ export const reviews: Review[] = [
     authorName: 'Olivier R.',
     rating: 5,
     comment: 'The rooftop lounge is a huge bonus. Building management is professional and quick to respond.',
+    status: 'published',
     createdAt: '2026-01-25T10:00:00.000Z',
   },
   {
@@ -55,6 +63,7 @@ export const reviews: Review[] = [
     authorName: 'Nadia P.',
     rating: 5,
     comment: 'One of the best-kept villas we viewed in Kiyovu. Staff quarters were a great addition.',
+    status: 'published',
     createdAt: '2026-03-01T10:00:00.000Z',
   },
   {
@@ -63,7 +72,31 @@ export const reviews: Review[] = [
     authorName: 'Samuel T.',
     rating: 4,
     comment: 'Solid apartment near Remera, though it can get noisy on market days.',
+    status: 'published',
     createdAt: '2026-04-01T10:00:00.000Z',
+  },
+  {
+    id: 'review-9',
+    propertyId: 'property-17',
+    authorId: 'guest-3',
+    authorName: 'Yvonne Keza',
+    rating: 2,
+    comment: 'The apartment itself is fine, but getting the landlord to answer about repairs took weeks each time.',
+    status: 'pending',
+    verifiedTenant: true,
+    flags: [],
+    createdAt: '2026-09-28T18:00:00.000Z',
+  },
+  {
+    id: 'review-10',
+    propertyId: 'property-2',
+    authorId: 'guest-4',
+    authorName: 'David Mugisha',
+    rating: 5,
+    comment: 'BEST HOUSES IN KIGALI, CALL 0788123456 OR VISIT www.cheap-kigali-rentals.example FOR A BETTER DEAL!!!',
+    status: 'pending',
+    flags: ['Contains a link', 'Contains a phone number', 'Written in all capitals'],
+    createdAt: '2026-09-29T07:20:00.000Z',
   },
 ]
 

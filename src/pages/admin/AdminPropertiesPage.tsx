@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Flag, Search, Trash2 } from 'lucide-react'
+import { CheckCircle2, Copy, Flag, Search, Trash2 } from 'lucide-react'
+import { VerificationBadge } from '../../components/trust/VerificationBadge'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
@@ -16,6 +17,7 @@ import { propertiesService } from '../../services/propertiesService'
 import { usersService } from '../../services/usersService'
 import type { ListingStatus, Property } from '../../types'
 import { formatRwf } from '../../utils/format'
+import { findDuplicates } from '../../utils/verification'
 
 const LISTING_VARIANT = { draft: 'neutral', pending: 'pending', published: 'success', flagged: 'danger' } as const
 const LISTING_FILTERS = [
@@ -24,6 +26,7 @@ const LISTING_FILTERS = [
   { value: 'pending', label: 'Pending' },
   { value: 'flagged', label: 'Flagged' },
   { value: 'draft', label: 'Draft' },
+  { value: 'duplicates', label: 'Possible duplicates' },
 ]
 
 export function AdminPropertiesPage() {
@@ -38,13 +41,20 @@ export function AdminPropertiesPage() {
 
   const ownerName = (ownerId: string) => users?.find((u) => u.id === ownerId)?.name ?? 'Unknown'
 
+  // Duplicate detection compares every listing against the rest, so it is computed once per load.
+  const duplicates = useMemo(() => {
+    const all = data ?? []
+    return new Map(all.map((property) => [property.id, findDuplicates(property, all)] as const).filter(([, matches]) => matches.length > 0))
+  }, [data])
+
   const filtered = useMemo(() => {
     return (data ?? []).filter((property) => {
       const matchesSearch = !search || property.title.toLowerCase().includes(search.toLowerCase())
-      const matchesStatus = !statusFilter || property.listingStatus === statusFilter
+      const matchesStatus =
+        !statusFilter || (statusFilter === 'duplicates' ? duplicates.has(property.id) : property.listingStatus === statusFilter)
       return matchesSearch && matchesStatus
     })
-  }, [data, search, statusFilter])
+  }, [data, search, statusFilter, duplicates])
 
   async function setListingStatus(property: Property, listingStatus: ListingStatus) {
     setBusyId(property.id)
@@ -76,6 +86,15 @@ export function AdminPropertiesPage() {
           <div className="min-w-0">
             <p className="truncate font-medium text-navy-900 dark:text-white">{row.title}</p>
             <p className="text-xs text-slate-500">{ownerName(row.ownerId)}</p>
+            {duplicates.has(row.id) && (
+              <p
+                className="mt-0.5 flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400"
+                title={duplicates.get(row.id)!.map((m) => `${m.property.title} (${ownerName(m.property.ownerId)}): ${m.reasons.join(', ')}`).join('\n')}
+              >
+                <Copy className="h-3 w-3" aria-hidden="true" />
+                Possible duplicate of {ownerName(duplicates.get(row.id)![0].property.ownerId)}'s listing
+              </p>
+            )}
           </div>
         </div>
       ),
@@ -96,6 +115,11 @@ export function AdminPropertiesPage() {
           {row.purpose === 'rent' && <span className="text-slate-500">/mo</span>}
         </>
       ),
+    },
+    {
+      key: 'verification',
+      header: 'Verification',
+      render: (row) => <VerificationBadge kind="property" status={row.verification} showUnverified />,
     },
     {
       key: 'listingStatus',
@@ -140,15 +164,16 @@ export function AdminPropertiesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <Input
           placeholder="Search listings"
+          aria-label="Search listings"
           leftIcon={<Search className="h-4 w-4" />}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
+          containerClassName="sm:max-w-xs"
         />
-        <Select options={LISTING_FILTERS} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-44" />
+        <Select aria-label="Filter by status" options={LISTING_FILTERS} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="sm:w-48" />
       </div>
 
       {error ? (

@@ -14,7 +14,7 @@ export function MapSearchPage() {
   const selected = published.find((p) => p.id === selectedId) ?? null
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full">
+    <div className="relative h-[calc(100dvh-3.5rem-4.25rem-env(safe-area-inset-bottom))] min-h-[24rem] w-full md:h-[calc(100dvh-4rem)]">
       {loading ? (
         <Skeleton className="h-full w-full rounded-none" />
       ) : error ? (
@@ -27,7 +27,7 @@ export function MapSearchPage() {
             properties={published}
             selectedId={selectedId}
             onSelect={setSelectedId}
-            className="h-full w-full"
+            className="h-full w-full rounded-none"
           />
           <PropertySlideCard property={selected} onClose={() => setSelectedId(null)} />
         </>

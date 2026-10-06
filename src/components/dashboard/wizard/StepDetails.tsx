@@ -1,5 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form'
 import { Input } from '../../ui/Input'
+import { COST_LABELS } from '../../listings/CostBreakdown'
 import { AMENITIES } from '../../../utils/constants'
 import { cn } from '../../../utils/cn'
 import type { WizardValues } from './wizardSchema'
@@ -65,6 +66,28 @@ export function StepDetails({ form }: { form: UseFormReturn<WizardValues> }) {
           error={errors.bathrooms?.message}
         />
       </div>
+
+      {isRent && (
+        <div>
+          <p className="text-sm font-medium text-navy-900 dark:text-white">Estimated monthly bills (RWF)</p>
+          <p className="mb-2 text-xs text-slate-500">
+            Tenants see rent plus these as the total monthly cost. Enter 0 for anything included in the rent.
+          </p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {COST_LABELS.map(({ key, label, hint }) => (
+              <Input
+                key={key}
+                label={label}
+                hint={hint}
+                type="number"
+                min={0}
+                {...register(`monthlyCosts.${key}`, { valueAsNumber: true })}
+                error={errors.monthlyCosts?.[key]?.message}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       <label className="flex cursor-pointer items-center justify-between rounded-lg border border-navy-700/15 px-3.5 py-3 dark:border-navy-700">
         <div>

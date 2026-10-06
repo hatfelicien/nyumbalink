@@ -19,7 +19,7 @@ const PRICE_PRESETS = [
 ]
 
 const BEDROOM_OPTIONS = [
-  { value: '', label: 'Any bedrooms' },
+  { value: '', label: 'Any' },
   { value: '1', label: '1+ bedroom' },
   { value: '2', label: '2+ bedrooms' },
   { value: '3', label: '3+ bedrooms' },
@@ -66,13 +66,19 @@ export function HeroSearchBar() {
           </button>
         ))}
       </div>
-      <div className="grid gap-3 rounded-2xl bg-white/95 p-4 shadow-soft backdrop-blur sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto] lg:items-end lg:p-3">
+      <div
+        className={cn(
+          'grid grid-cols-2 gap-3 rounded-2xl bg-white/95 p-4 text-left shadow-soft backdrop-blur dark:bg-navy-900/90 lg:items-end lg:p-3',
+          purpose === 'rent' ? 'lg:grid-cols-[1.4fr_1fr_1fr_1fr_auto]' : 'lg:grid-cols-[1.4fr_1fr_1fr_auto]',
+        )}
+      >
         <Input
           label="Location"
           placeholder="Kimironko, Kiyovu…"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           list="hero-neighbourhoods"
+          containerClassName="col-span-2 lg:col-span-1"
         />
         <datalist id="hero-neighbourhoods">
           {KIGALI_NEIGHBOURHOODS.map((name) => (
@@ -80,7 +86,13 @@ export function HeroSearchBar() {
           ))}
         </datalist>
         {purpose === 'rent' && (
-          <Select label="Budget" options={PRICE_PRESETS} value={priceRange} onChange={(e) => setPriceRange(e.target.value)} />
+          <Select
+            label="Budget"
+            options={PRICE_PRESETS}
+            value={priceRange}
+            onChange={(e) => setPriceRange(e.target.value)}
+            className="col-span-2 sm:col-span-1"
+          />
         )}
         <Select label="Bedrooms" options={BEDROOM_OPTIONS} value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} />
         <Select
@@ -89,7 +101,7 @@ export function HeroSearchBar() {
           value={type}
           onChange={(e) => setType(e.target.value)}
         />
-        <Button type="submit" size="lg" className="w-full lg:w-auto" icon={<Search className="h-4 w-4" />}>
+        <Button type="submit" size="lg" className="col-span-2 w-full lg:col-span-1 lg:w-auto" icon={<Search className="h-4 w-4" />}>
           Search
         </Button>
       </div>

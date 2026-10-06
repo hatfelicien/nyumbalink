@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MessageCircle, MessagesSquare, ShieldCheck, Smartphone } from 'lucide-react'
+import { CalendarDays, FileSignature, MessageCircle, MessagesSquare, Smartphone } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useToast } from '../../hooks/useToast'
 import { chatService } from '../../services/chatService'
 import type { Property, User } from '../../types'
 import { Avatar } from '../ui/Avatar'
-import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { buildWhatsAppLink, formatDate, formatRwf } from '../../utils/format'
 import { ContactOwnerModal } from './ContactOwnerModal'
 import { MobileMoneyModal } from '../payments/MobileMoneyModal'
+import { RentalApplicationModal } from '../rentals/RentalApplicationModal'
+import { ScheduleViewingModal } from '../rentals/ScheduleViewingModal'
+import { VerificationBadge } from '../trust/VerificationBadge'
 
 export function OwnerCard({ owner, property }: { owner: User; property: Property }) {
   const { user } = useAuth()
@@ -21,6 +23,8 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
   const navigate = useNavigate()
   const [contactOpen, setContactOpen] = useState(false)
   const [paymentOpen, setPaymentOpen] = useState(false)
+  const [viewingOpen, setViewingOpen] = useState(false)
+  const [applyOpen, setApplyOpen] = useState(false)
   const [startingChat, setStartingChat] = useState(false)
 
   const whatsAppHref = owner.phone
@@ -30,14 +34,20 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
   const paymentPurpose = property.purpose === 'rent' ? 'caution' : 'reservation'
   const paymentAmount = property.purpose === 'rent' ? property.cautionMoney : Math.round(property.price * 0.01)
   const canPay = property.purpose === 'rent' ? paymentAmount > 0 : true
+  const isOwnListing = user?.id === owner.id
+  const canApply = property.purpose === 'rent' && property.status === 'available'
+
+  /** Sends signed-out visitors to log in and back; returns whether the action can go ahead. */
+  function requireLogin(action: string) {
+    if (user) return true
+    showToast(`Log in to ${action}`, { description: 'It only takes a moment.', variant: 'error' })
+    navigate(`/login?returnTo=${encodeURIComponent(`/listings/${property.id}`)}`)
+    return false
+  }
 
   async function handleChat() {
-    if (!user) {
-      showToast('Log in to chat', { description: 'Sign in to message this owner.', variant: 'error' })
-      navigate(`/login?returnTo=${encodeURIComponent(`/listings/${property.id}`)}`)
-      return
-    }
-    if (user.id === owner.id) return
+    if (!requireLogin('chat') || !user) return
+    if (isOwnListing) return
     setStartingChat(true)
     const thread = await chatService.getOrCreateThread(property.id, user.id, owner.id)
     // No setStartingChat(false) here — navigating away unmounts this component, and
@@ -51,19 +61,27 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
       <div className="flex items-center gap-3">
         <Avatar name={owner.name} src={owner.avatar} size="lg" />
         <div>
-          <div className="flex items-center gap-1.5">
-            <p className="font-semibold text-navy-900 dark:text-white">{owner.name}</p>
-            {owner.verified && (
-              <Badge variant="brand" className="gap-1">
-                <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-                {t('property.verified')}
-              </Badge>
-            )}
-          </div>
+          <p className="font-semibold text-navy-900 dark:text-white">{owner.name}</p>
           <p className="text-sm text-slate-500">Owner since {formatDate(owner.createdAt)}</p>
+          <VerificationBadge kind="landlord" status={owner.verification ?? 'unverified'} showUnverified className="mt-1.5" />
         </div>
       </div>
-      <Button onClick={handleChat} loading={startingChat} icon={<MessagesSquare className="h-4 w-4" />}>
+
+      {!isOwnListing && (
+        <Button onClick={() => requireLogin('schedule a viewing') && setViewingOpen(true)} icon={<CalendarDays className="h-4 w-4" />}>
+          {t('property.scheduleViewing')}
+        </Button>
+      )}
+      {!isOwnListing && canApply && (
+        <Button
+          variant="secondary"
+          onClick={() => requireLogin('apply') && setApplyOpen(true)}
+          icon={<FileSignature className="h-4 w-4" />}
+        >
+          {t('property.apply')}
+        </Button>
+      )}
+      <Button variant="secondary" onClick={handleChat} loading={startingChat} icon={<MessagesSquare className="h-4 w-4" />}>
         {t('property.chatWithOwner')}
       </Button>
       <Button variant="secondary" onClick={() => setContactOpen(true)} icon={<MessageCircle className="h-4 w-4" />}>
@@ -106,6 +124,12 @@ export function OwnerCard({ owner, property }: { owner: User; property: Property
         purpose={paymentPurpose}
         amount={paymentAmount}
       />
+      {user && (
+        <>
+          <ScheduleViewingModal open={viewingOpen} onClose={() => setViewingOpen(false)} property={property} tenantId={user.id} />
+          <RentalApplicationModal open={applyOpen} onClose={() => setApplyOpen(false)} property={property} tenantId={user.id} />
+        </>
+      )}
     </Card>
   )
 }

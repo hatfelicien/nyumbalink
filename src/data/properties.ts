@@ -1,4 +1,14 @@
-import type { Amenity, Property, PropertyStatus, PropertyType, ListingPurpose, ListingStatus, Coordinates } from '../types'
+import type {
+  Amenity,
+  Coordinates,
+  ListingPurpose,
+  ListingStatus,
+  MonthlyCosts,
+  Property,
+  PropertyStatus,
+  PropertyType,
+  VerificationStatus,
+} from '../types'
 
 const IMAGE_POOL = [
   'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80&auto=format&fit=crop',
@@ -684,7 +694,78 @@ const RAW_PROPERTIES: RawProperty[] = [
     views: 645,
     createdAt: '2026-06-10T09:00:00.000Z',
   },
+  {
+    // Deliberate near-copy of property-1 from a different, unverified account at a
+    // too-good price: seed data for the duplicate-listing detector in the admin queue.
+    title: 'Modern 2-Bedroom Apartment in Kimironko',
+    description:
+      'Modern two bedroom apartment near Kimironko market, fully furnished. Pay the first month by mobile money today to reserve before viewing.',
+    type: 'apartment',
+    district: 'Gasabo — Kimironko',
+    coordinates: { lat: -1.9441, lng: 30.1121 },
+    price: 250000,
+    purpose: 'rent',
+    negotiable: false,
+    cautionMoney: 250000,
+    bedrooms: 2,
+    bathrooms: 2,
+    sizeSqm: 85,
+    furnished: true,
+    amenities: ['wifi', 'parking', 'security'],
+    status: 'available',
+    listingStatus: 'pending',
+    imageOffset: 0,
+    imageCount: 3,
+    ownerId: 'owner-5',
+    rating: 0,
+    reviewCount: 0,
+    views: 12,
+    createdAt: '2026-09-26T09:00:00.000Z',
+  },
 ]
+
+/** Ownership-verification state per seeded listing (1-based index); anything not listed is unverified. */
+const VERIFICATION: Record<number, { status: VerificationStatus; verifiedAt?: string; upi?: string }> = {
+  1: { status: 'verified', verifiedAt: '2026-06-04T09:00:00.000Z', upi: '1/02/09/03/1184' },
+  2: { status: 'verified', verifiedAt: '2026-05-21T09:00:00.000Z', upi: '1/01/04/02/0672' },
+  3: { status: 'verified', verifiedAt: '2026-02-12T09:00:00.000Z', upi: '1/02/13/01/2210' },
+  4: { status: 'pending' },
+  5: { status: 'rejected' },
+  6: { status: 'verified', verifiedAt: '2026-03-30T09:00:00.000Z', upi: '1/02/12/04/0931' },
+  9: { status: 'verified', verifiedAt: '2026-01-18T09:00:00.000Z', upi: '1/03/05/02/1457' },
+  11: { status: 'verified', verifiedAt: '2026-04-08T09:00:00.000Z', upi: '1/02/06/01/3302' },
+  14: { status: 'verified', verifiedAt: '2026-04-22T09:00:00.000Z', upi: '1/02/05/03/0418' },
+  15: { status: 'pending' },
+  19: { status: 'pending' },
+}
+
+/** Listings whose owners chose to show only the general area publicly. */
+const APPROXIMATE_LOCATION = new Set([3, 7, 22])
+
+const VIDEO_TOURS: Record<number, string> = {
+  1: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+}
+
+function estimateMonthlyCosts(raw: RawProperty): MonthlyCosts {
+  if (raw.purpose === 'sale') return { water: 0, electricity: 0, internet: 0, security: 0, garbage: 0 }
+  const large = raw.type === 'villa' || raw.type === 'bungalow'
+  return {
+    water: 4000 + raw.bedrooms * 3000,
+    electricity: 8000 + raw.bedrooms * 6000 + (raw.amenities.includes('ac') ? 15000 : 0),
+    // Listings that advertise wifi include it in the rent.
+    internet: raw.amenities.includes('wifi') ? 0 : 25000,
+    security: large ? 5000 : 2000,
+    garbage: large ? 5000 : 3000,
+  }
+}
+
+/** Mains connections are near-universal in Kigali; a few seeded listings lack one to keep the filters meaningful. */
+function withUtilities(amenities: Amenity[], index: number): Amenity[] {
+  const utilities: Amenity[] = []
+  if (index % 6 !== 4) utilities.push('piped water')
+  if (index % 5 !== 3) utilities.push('cash power')
+  return [...utilities, ...amenities]
+}
 
 export const properties: Property[] = RAW_PROPERTIES.map((raw, index) => ({
   id: `property-${index + 1}`,
@@ -699,15 +780,21 @@ export const properties: Property[] = RAW_PROPERTIES.map((raw, index) => ({
   bathrooms: raw.bathrooms,
   sizeSqm: raw.sizeSqm,
   furnished: raw.furnished,
-  amenities: raw.amenities,
+  amenities: withUtilities(raw.amenities, index),
   status: raw.status,
   availableFrom: raw.availableFrom,
   listingStatus: raw.listingStatus,
   images: imagesFor(raw.imageOffset, raw.imageCount),
+  videoUrl: VIDEO_TOURS[index + 1],
   address: raw.district,
   city: 'Kigali',
   district: raw.district,
   coordinates: raw.coordinates,
+  locationPrecision: APPROXIMATE_LOCATION.has(index + 1) ? 'approximate' : 'exact',
+  monthlyCosts: estimateMonthlyCosts(raw),
+  verification: VERIFICATION[index + 1]?.status ?? 'unverified',
+  verifiedAt: VERIFICATION[index + 1]?.verifiedAt,
+  upi: VERIFICATION[index + 1]?.upi,
   ownerId: raw.ownerId,
   rating: raw.rating,
   reviewCount: raw.reviewCount,

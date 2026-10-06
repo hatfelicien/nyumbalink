@@ -22,7 +22,8 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1198780012345678',
     status: 'active',
-    verified: true,
+    verification: 'verified',
+    verifiedAt: '2024-02-20T08:00:00.000Z',
     createdAt: '2024-02-14T08:00:00.000Z',
   },
   {
@@ -35,7 +36,8 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1198880023456789',
     status: 'active',
-    verified: true,
+    verification: 'verified',
+    verifiedAt: '2024-03-09T08:00:00.000Z',
     createdAt: '2024-03-02T08:00:00.000Z',
   },
   {
@@ -48,6 +50,7 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1198980034567890',
     status: 'active',
+    verification: 'pending',
     createdAt: '2024-03-20T08:00:00.000Z',
   },
   {
@@ -60,6 +63,7 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1199080045678901',
     status: 'suspended',
+    verification: 'rejected',
     createdAt: '2024-04-05T08:00:00.000Z',
   },
   {
@@ -72,6 +76,7 @@ export const users: User[] = [
     city: 'Kigali',
     nationalId: '1199180056789012',
     status: 'active',
+    verification: 'unverified',
     createdAt: '2024-05-11T08:00:00.000Z',
   },
   {

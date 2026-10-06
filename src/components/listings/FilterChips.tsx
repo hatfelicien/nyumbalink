@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { FilterState } from '../../types'
 import { AMENITIES, PRICE_MAX, PRICE_MIN, PROPERTY_TYPES, SALE_PRICE_MAX, SALE_PRICE_MIN } from '../../utils/constants'
+import { cn } from '../../utils/cn'
 import { formatRwf } from '../../utils/format'
 
 export interface FilterPanelSetters {
@@ -60,6 +61,9 @@ function buildChips({ filters, setFilter, setFilters, toggleAmenity }: FilterPan
   if (filters.status) {
     chips.push({ key: 'status', label: filters.status, onRemove: () => setFilter('status', null) })
   }
+  if (filters.verifiedOnly) {
+    chips.push({ key: 'verifiedOnly', label: 'Verified only', onRemove: () => setFilter('verifiedOnly', false) })
+  }
   filters.amenities.forEach((amenity) => {
     const label = AMENITIES.find((a) => a.value === amenity)?.label ?? amenity
     chips.push({ key: `amenity-${amenity}`, label, onRemove: () => toggleAmenity(amenity) })
@@ -68,13 +72,13 @@ function buildChips({ filters, setFilter, setFilters, toggleAmenity }: FilterPan
   return chips
 }
 
-export function FilterChips(props: FilterPanelSetters) {
+export function FilterChips({ className, ...props }: FilterPanelSetters & { className?: string }) {
   const chips = buildChips(props)
 
   if (chips.length === 0) return null
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={cn('flex flex-wrap gap-2', className)}>
       <AnimatePresence initial={false}>
         {chips.map((chip) => (
           <motion.button

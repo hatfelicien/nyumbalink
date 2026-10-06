@@ -6,7 +6,7 @@ export function HeroSection() {
   const { t } = useLanguage()
 
   return (
-    <section className="relative overflow-hidden bg-navy-950 pb-28 pt-24 sm:pt-32">
+    <section className="relative overflow-hidden bg-navy-950 pb-14 pt-12 sm:pb-24 sm:pt-24 lg:pb-28 lg:pt-32">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <motion.div
           className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-blue-500/30 blur-3xl"
@@ -30,7 +30,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-sky-300"
+          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-sky-300 sm:px-4 sm:text-sm"
         >
           {t('hero.badge')}
         </motion.span>
@@ -39,7 +39,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.05 }}
-          className="mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-display"
+          className="mt-5 text-[2.1rem] font-bold leading-[1.08] tracking-tight text-white sm:mt-6 sm:text-5xl lg:text-display"
         >
           {t('hero.headline')}
         </motion.h1>
@@ -48,7 +48,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/70"
+          className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/70 sm:mt-5 sm:text-lg"
         >
           {t('hero.subheadline')}
         </motion.p>
@@ -57,7 +57,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.18 }}
-          className="mt-10"
+          className="mt-8 sm:mt-10"
         >
           <HeroSearchBar />
         </motion.div>

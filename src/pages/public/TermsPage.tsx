@@ -27,8 +27,8 @@ const SECTIONS = [
 
 export function TermsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold text-navy-900 dark:text-white">Terms of service</h1>
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+      <h1 className="text-2xl font-semibold text-navy-900 dark:text-white sm:text-3xl">Terms of service</h1>
       <p className="mt-2 text-sm text-slate-500">Last updated 1 August 2026</p>
 
       <div className="mt-10 space-y-8">

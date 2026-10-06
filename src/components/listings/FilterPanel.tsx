@@ -1,4 +1,4 @@
-import { Home, MapPin } from 'lucide-react'
+import { BadgeCheck, Home, MapPin } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import type { FilterState, ListingPurpose, PropertyStatus, PropertyType } from '../../types'
 import {
@@ -15,6 +15,7 @@ import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { RangeSlider } from '../ui/RangeSlider'
 import { Select } from '../ui/Select'
+import { Switch } from '../ui/Switch'
 import { cn } from '../../utils/cn'
 
 export interface FilterPanelProps {
@@ -24,6 +25,8 @@ export interface FilterPanelProps {
   toggleAmenity: (amenity: FilterState['amenities'][number]) => void
   resetFilters: () => void
   className?: string
+  /** The drawer on small screens has its own title and reset button. */
+  showHeader?: boolean
 }
 
 const ROOM_OPTIONS = [
@@ -48,7 +51,15 @@ const PURPOSE_TABS: { value: ListingPurpose | ''; label: string }[] = [
   { value: 'sale', label: 'For sale' },
 ]
 
-export function FilterPanel({ filters, setFilter, setFilters, toggleAmenity, resetFilters, className }: FilterPanelProps) {
+export function FilterPanel({
+  filters,
+  setFilter,
+  setFilters,
+  toggleAmenity,
+  resetFilters,
+  className,
+  showHeader = true,
+}: FilterPanelProps) {
   const { t } = useLanguage()
   const isSale = filters.purpose === 'sale'
   const priceMin = isSale ? SALE_PRICE_MIN : PRICE_MIN
@@ -64,29 +75,49 @@ export function FilterPanel({ filters, setFilter, setFilters, toggleAmenity, res
 
   return (
     <div className={cn('space-y-6', className)}>
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-navy-900 dark:text-white">{t('filters.title')}</h2>
-        <Button variant="ghost" size="sm" onClick={resetFilters}>
-          {t('filters.reset')}
-        </Button>
+      {showHeader && (
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-navy-900 dark:text-white">{t('filters.title')}</h2>
+          <Button variant="ghost" size="sm" onClick={resetFilters}>
+            {t('filters.reset')}
+          </Button>
+        </div>
+      )}
+
+      <div role="radiogroup" aria-label="Listing type" className="flex rounded-xl bg-navy-900/5 p-1 dark:bg-white/10">
+        {PURPOSE_TABS.map((tab) => {
+          const active = (filters.purpose ?? '') === tab.value
+          return (
+            <button
+              key={tab.label}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              onClick={() => selectPurpose((tab.value || null) as ListingPurpose | null)}
+              className={cn(
+                'flex-1 rounded-lg px-2 py-2 text-sm font-medium transition-all',
+                active
+                  ? 'bg-white text-navy-900 shadow-sm dark:bg-navy-700 dark:text-white'
+                  : 'text-slate-500 hover:text-navy-900 dark:hover:text-white',
+              )}
+            >
+              {tab.value === '' ? t('filters.all') : t(tab.value === 'sale' ? 'listing.forSale' : 'listing.forRent')}
+            </button>
+          )
+        })}
       </div>
 
-      <div className="flex rounded-xl border border-navy-700/15 p-1 dark:border-navy-700">
-        {PURPOSE_TABS.map((tab) => (
-          <button
-            key={tab.label}
-            type="button"
-            onClick={() => selectPurpose((tab.value || null) as ListingPurpose | null)}
-            className={cn(
-              'flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-              (filters.purpose ?? '') === tab.value
-                ? 'bg-blue-500 text-white shadow-glow'
-                : 'text-navy-900 hover:bg-navy-900/5 dark:text-white dark:hover:bg-white/10',
-            )}
-          >
-            {tab.value === '' ? t('filters.all') : t(tab.value === 'sale' ? 'listing.forSale' : 'listing.forRent')}
-          </button>
-        ))}
+      <div
+        className={cn(
+          'flex items-center justify-between gap-3 rounded-xl border px-3.5 py-3 transition-colors',
+          filters.verifiedOnly ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-navy-700/15 dark:border-navy-700',
+        )}
+      >
+        <span className="flex items-center gap-2 text-sm font-medium text-navy-900 dark:text-white">
+          <BadgeCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          {t('filters.verifiedOnly')}
+        </span>
+        <Switch checked={filters.verifiedOnly} onChange={(checked) => setFilter('verifiedOnly', checked)} label={t('filters.verifiedOnly')} />
       </div>
 
       <Input
@@ -137,60 +168,60 @@ export function FilterPanel({ filters, setFilter, setFilters, toggleAmenity, res
 
       <div>
         <p className="mb-1.5 text-sm font-medium text-navy-900 dark:text-white">{t('filters.furnished')}</p>
-        <div className="flex gap-2">
+        <div role="radiogroup" aria-label={t('filters.furnished')} className="flex rounded-xl bg-navy-900/5 p-1 dark:bg-white/10">
           {[
             { label: 'Any', value: null },
             { label: 'Furnished', value: true },
             { label: 'Unfurnished', value: false },
-          ].map((option) => (
-            <button
-              key={option.label}
-              type="button"
-              onClick={() => setFilter('furnished', option.value)}
-              className={cn(
-                'flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
-                filters.furnished === option.value
-                  ? 'border-blue-500 bg-blue-500/10 text-blue-500'
-                  : 'border-navy-700/15 text-navy-900 hover:border-blue-400 dark:border-navy-700 dark:text-white',
-              )}
-            >
-              {option.label}
-            </button>
-          ))}
+          ].map((option) => {
+            const active = filters.furnished === option.value
+            return (
+              <button
+                key={option.label}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setFilter('furnished', option.value)}
+                className={cn(
+                  'min-w-0 flex-1 truncate rounded-lg px-1 py-2 text-xs font-medium transition-all',
+                  active
+                    ? 'bg-white text-navy-900 shadow-sm dark:bg-navy-700 dark:text-white'
+                    : 'text-slate-500 hover:text-navy-900 dark:hover:text-white',
+                )}
+              >
+                {option.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <div>
-        <p className="mb-2 flex items-center gap-1.5 text-sm font-medium text-navy-900 dark:text-white">
+      <fieldset>
+        <legend className="mb-2 flex items-center gap-1.5 text-sm font-medium text-navy-900 dark:text-white">
           <Home className="h-4 w-4" aria-hidden="true" />
           {t('filters.amenities')}
-        </p>
-        <div className="grid grid-cols-2 gap-2">
+        </legend>
+        <div className="flex flex-wrap gap-2">
           {AMENITIES.map((amenity) => {
             const checked = filters.amenities.includes(amenity.value)
             return (
               <label
                 key={amenity.value}
                 className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
+                  'flex cursor-pointer select-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-400',
                   checked
-                    ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                    ? 'border-blue-500 bg-blue-500 text-white'
                     : 'border-navy-700/15 text-navy-900 hover:border-blue-400 dark:border-navy-700 dark:text-white',
                 )}
               >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => toggleAmenity(amenity.value)}
-                  className="sr-only"
-                />
-                <amenity.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <input type="checkbox" checked={checked} onChange={() => toggleAmenity(amenity.value)} className="sr-only" />
+                <amenity.icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 {amenity.label}
               </label>
             )
           })}
         </div>
-      </div>
+      </fieldset>
 
       <Select
         label={t('filters.availability')}

@@ -1,25 +1,42 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { en } from '../i18n/en'
 import type { TranslationKey } from '../i18n/en'
+import { fr } from '../i18n/fr'
 import { rw } from '../i18n/rw'
 import { STORAGE_KEYS, storage } from '../utils/storage'
 
-export type Language = 'en' | 'rw'
+export type Language = 'en' | 'rw' | 'fr'
 
-const DICTIONARIES: Record<Language, Record<TranslationKey, string>> = { en, rw }
+export const LANGUAGES: { code: Language; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'rw', label: 'Kinyarwanda' },
+  { code: 'fr', label: 'Français' },
+]
+
+const DICTIONARIES: Record<Language, Record<TranslationKey, string>> = { en, rw, fr }
 
 interface LanguageContextValue {
   language: Language
   setLanguage: (language: Language) => void
+  /** Steps to the next language in `LANGUAGES`, wrapping around. */
   toggleLanguage: () => void
   t: (key: TranslationKey) => string
 }
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined)
 
+function loadLanguage(): Language {
+  const stored = storage.get<Language>(STORAGE_KEYS.language)
+  return stored && stored in DICTIONARIES ? stored : 'en'
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => storage.get<Language>(STORAGE_KEYS.language) ?? 'en')
+  const [language, setLanguageState] = useState<Language>(loadLanguage)
+
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
 
   const setLanguage = useCallback((next: Language) => {
     setLanguageState(next)
@@ -27,7 +44,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleLanguage = useCallback(() => {
-    setLanguage(language === 'en' ? 'rw' : 'en')
+    const index = LANGUAGES.findIndex((l) => l.code === language)
+    setLanguage(LANGUAGES[(index + 1) % LANGUAGES.length].code)
   }, [language, setLanguage])
 
   const t = useCallback((key: TranslationKey) => DICTIONARIES[language][key] ?? en[key] ?? key, [language])

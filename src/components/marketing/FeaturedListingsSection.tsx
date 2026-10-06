@@ -16,7 +16,7 @@ export function FeaturedListingsSection() {
     .slice(0, 8)
 
   return (
-    <section className="bg-slate-50 py-20 dark:bg-navy-950/40">
+    <section className="bg-slate-50 py-16 dark:bg-navy-950/40 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between">
           <div>
@@ -35,10 +35,10 @@ export function FeaturedListingsSection() {
         {error ? (
           <ErrorState onRetry={reload} description="We could not load featured listings." />
         ) : (
-          <div className="mt-8 flex snap-x gap-5 overflow-x-auto pb-4">
+          <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 scrollbar-none sm:mx-0 sm:gap-5 sm:px-0">
             {loading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="w-72 shrink-0 snap-start">
+                  <div key={i} className="w-[78%] max-w-[18rem] shrink-0 snap-start sm:w-72">
                     <PropertyCardSkeleton />
                   </div>
                 ))
@@ -49,7 +49,7 @@ export function FeaturedListingsSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: index * 0.06 }}
-                    className="w-72 shrink-0 snap-start"
+                    className="w-[78%] max-w-[18rem] shrink-0 snap-start sm:w-72"
                   >
                     <PropertyCard property={property} />
                   </motion.div>

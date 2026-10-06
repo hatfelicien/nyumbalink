@@ -19,7 +19,7 @@ export function PopularLocationsSection() {
   const { data } = useAsync(() => propertiesService.list(), [])
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <div className="text-center">
         <h2 className="text-3xl font-semibold text-navy-900 dark:text-white">Popular locations</h2>
         <p className="mx-auto mt-3 max-w-xl text-slate-500">Browse by the neighbourhoods tenants search for most.</p>

@@ -109,10 +109,11 @@ export function AdminUsersPage() {
     <div className="space-y-6">
       <Input
         placeholder="Search by name or email"
+        aria-label="Search by name or email"
         leftIcon={<Search className="h-4 w-4" />}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="max-w-xs"
+        containerClassName="sm:max-w-xs"
       />
 
       {error ? (

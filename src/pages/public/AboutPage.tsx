@@ -5,7 +5,7 @@ const VALUES = [
   {
     icon: ShieldCheck,
     title: 'Verified listings',
-    description: 'Every owner goes through a review before publishing, so what you see is what is actually available.',
+    description: 'Landlords prove their identity and their right to rent each home. Look for the verified badges on every listing.',
   },
   {
     icon: MapPinned,
@@ -21,9 +21,9 @@ const VALUES = [
 
 export function AboutPage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <h1 className="text-3xl font-semibold text-navy-900 dark:text-white sm:text-4xl">About NyumbaLink</h1>
+        <h1 className="text-[1.75rem] font-semibold leading-tight text-navy-900 dark:text-white sm:text-4xl">About NyumbaLink</h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-slate-500">
           NyumbaLink is a rental platform built for Kigali's housing market. We connect tenants directly with
           property owners across Nyarugenge, Gasabo, and Kicukiro — from budget shared rooms to executive
