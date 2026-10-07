@@ -16,7 +16,8 @@ export interface User {
   /** WhatsApp number when it differs from `phone`. */
   whatsapp?: string
   nationalId?: string
-  status: 'active' | 'suspended' | 'pending'
+  /** 'pending' landlords applied and are waiting for an admin; 'rejected' were turned down. Neither can log in. */
+  status: 'active' | 'suspended' | 'pending' | 'rejected'
   /** Identity check (national ID / passport) reviewed by an admin. Owners only; guests and admins leave this unset. */
   verification?: VerificationStatus
   verifiedAt?: string
@@ -138,6 +139,15 @@ export interface OwnerApplication {
   city: string
   message: string
   status: ApplicationStatus
+  /** The pending landlord account created with the application; approving it activates this account. */
+  userId?: string
+  nationalId?: string
+  /** Kigali district (or other town) where the properties are. */
+  district?: string
+  propertyCount?: string
+  /** Shown to the applicant when an application is rejected. */
+  reviewNote?: string
+  reviewedAt?: string
   createdAt: string
 }
 

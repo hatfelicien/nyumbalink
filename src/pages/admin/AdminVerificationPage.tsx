@@ -165,7 +165,7 @@ function RequestCard({ item, busy, onApprove, onReject }: RequestCardProps) {
       </div>
 
       {request.status === 'pending' ? (
-        <div className="flex gap-2 border-t border-navy-700/10 pt-4 dark:border-navy-700">
+        <div className="flex flex-col gap-2 border-t border-navy-700/10 pt-4 dark:border-navy-700 min-[420px]:flex-row">
           <Button size="sm" className="flex-1" icon={<Check className="h-4 w-4" />} loading={busy} onClick={onApprove}>
             Approve and grant badge
           </Button>

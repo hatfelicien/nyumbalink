@@ -22,8 +22,8 @@ export function CompareBar() {
           exit={{ opacity: 0, y: 24 }}
           className={cn(
             'bottom-tabbar pointer-events-none fixed inset-x-0 z-30 flex justify-end px-4 print:hidden md:bottom-6 md:justify-center',
-            // Listing pages have their own sticky call-to-action bar on phones.
-            onListing && 'max-md:hidden',
+            // Listing pages have their own sticky call-to-action bar below desktop width.
+            onListing && 'max-lg:hidden',
           )}
         >
           <div className="pointer-events-auto flex items-center gap-1 rounded-full bg-navy-900 py-1.5 pl-4 pr-1.5 text-white shadow-soft dark:bg-navy-800">

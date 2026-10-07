@@ -118,6 +118,7 @@ function App() {
                     <Route path="login" element={<LoginPage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route path="become-an-owner" element={<BecomeOwnerPage />} />
+                    <Route path="register/landlord" element={<BecomeOwnerPage />} />
                     <Route path="forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="contact" element={<ContactPage />} />

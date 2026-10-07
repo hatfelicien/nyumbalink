@@ -5,7 +5,7 @@ import { VerificationBadge } from '../trust/VerificationBadge'
 import type { User } from '../../types'
 import { formatDate } from '../../utils/format'
 
-const STATUS_VARIANT = { active: 'success', pending: 'pending', suspended: 'danger' } as const
+const STATUS_VARIANT = { active: 'success', pending: 'pending', suspended: 'danger', rejected: 'danger' } as const
 
 export function ViewUserModal({ user, onClose }: { user: User | null; onClose: () => void }) {
   return (

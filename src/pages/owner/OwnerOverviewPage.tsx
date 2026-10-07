@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { BadgeCheck, Building2, CalendarDays, Eye, FileText, Inbox, MessageSquare, Wrench } from 'lucide-react'
 import { LineChart } from '../../components/dashboard/LineChart'
+import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { ErrorState } from '../../components/ui/ErrorState'
@@ -48,8 +49,21 @@ export function OwnerOverviewPage() {
   if (list.length === 0) {
     return (
       <EmptyState
-        title="No properties yet"
-        description="Add your first property to start receiving enquiries from tenants."
+        icon={Building2}
+        title={`Welcome, ${user!.name.split(' ')[0]}`}
+        description="Your landlord account is active. Add your first property, then verify your identity and ownership so tenants see the verified badges."
+        action={
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link to="/owner/properties/new">
+              <Button className="w-full">Add your first property</Button>
+            </Link>
+            <Link to="/owner/verification">
+              <Button variant="secondary" className="w-full">
+                Verify your identity
+              </Button>
+            </Link>
+          </div>
+        }
       />
     )
   }

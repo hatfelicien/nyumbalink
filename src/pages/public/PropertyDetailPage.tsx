@@ -269,15 +269,19 @@ export function PropertyDetailPage() {
         )}
         aria-hidden={contactInView || undefined}
       >
-        <div className="mx-auto flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-navy-700/10 bg-white/95 p-2.5 pl-4 shadow-soft backdrop-blur-xl dark:border-navy-700 dark:bg-navy-800/95">
+        <div className="mx-auto flex max-w-xl items-center justify-between gap-2 rounded-2xl border border-navy-700/10 bg-white/95 p-2 pl-3 shadow-soft backdrop-blur-xl dark:border-navy-700 dark:bg-navy-800/95 min-[360px]:gap-3 min-[360px]:p-2.5 min-[360px]:pl-4">
           <div className="min-w-0">
-            <p className="truncate text-base font-bold text-navy-900 dark:text-white">
+            <p className="whitespace-nowrap text-sm font-bold text-navy-900 dark:text-white min-[360px]:text-base">
               {formatRwf(property.price)}
               {property.purpose === 'rent' && <span className="text-xs font-normal text-slate-500">/mo</span>}
             </p>
             <p className="truncate text-xs text-slate-500">{property.district}</p>
           </div>
-          <Button onClick={scrollToContact} icon={<CalendarDays className="h-4 w-4" />} className="shrink-0">
+          <Button
+            onClick={scrollToContact}
+            icon={<CalendarDays className="hidden h-4 w-4 min-[360px]:block" />}
+            className="shrink-0 px-3.5 min-[360px]:px-5"
+          >
             {t('property.scheduleViewing')}
           </Button>
         </div>

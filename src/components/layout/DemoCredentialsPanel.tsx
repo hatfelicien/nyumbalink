@@ -34,7 +34,7 @@ export function DemoCredentialsPanel({ onSelect, loading }: { onSelect: (email: 
           >
             <account.icon className="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" aria-hidden="true" />
             <span className="font-medium text-navy-900 dark:text-white">{account.role}</span>
-            <span className="ml-auto text-xs text-slate-500">{account.email}</span>
+            <span className="ml-auto min-w-0 truncate text-xs text-slate-500">{account.email}</span>
           </button>
         ))}
       </div>

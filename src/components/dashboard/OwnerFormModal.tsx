@@ -14,7 +14,7 @@ const ownerFormSchema = z.object({
   phone: z.string().min(8, 'Enter a valid phone number'),
   city: z.string().min(2, 'Enter a city'),
   nationalId: z.string().min(5, 'Enter a valid national ID'),
-  status: z.enum(['active', 'suspended', 'pending']),
+  status: z.enum(['active', 'suspended', 'pending', 'rejected']),
 })
 
 export type OwnerFormValues = z.infer<typeof ownerFormSchema>
@@ -23,6 +23,7 @@ const STATUS_OPTIONS = [
   { value: 'active', label: 'Active' },
   { value: 'pending', label: 'Pending' },
   { value: 'suspended', label: 'Suspended' },
+  { value: 'rejected', label: 'Rejected' },
 ]
 
 export interface OwnerFormModalProps {

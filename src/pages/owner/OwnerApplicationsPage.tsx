@@ -115,7 +115,7 @@ export function OwnerApplicationsPage() {
               <p className="text-sm italic leading-relaxed text-slate-500">“{application.message}”</p>
 
               {application.status === 'submitted' && (
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 min-[420px]:flex-row">
                   <Button
                     size="sm"
                     className="flex-1"

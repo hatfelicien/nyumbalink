@@ -293,20 +293,24 @@ function PersonalInfoForm({ user }: { user: User }) {
   )
 }
 
-function PasswordForm() {
+function PasswordForm({ userId }: { userId: string }) {
   const { showToast } = useToast()
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<PasswordValues>({ resolver: zodResolver(passwordSchema), defaultValues: { current: '', next: '', confirm: '' } })
 
-  async function onSubmit() {
-    // There is no real authentication behind this demo yet, so nothing is stored.
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    reset()
-    showToast('Password updated', { description: 'Use your new password next time you log in.', variant: 'success' })
+  async function onSubmit(values: PasswordValues) {
+    try {
+      await usersService.changePassword(userId, values.current, values.next)
+      reset()
+      showToast('Password updated', { description: 'Use your new password next time you log in.', variant: 'success' })
+    } catch (error) {
+      setError('current', { message: error instanceof Error ? error.message : 'Could not update your password.' })
+    }
   }
 
   return (
@@ -372,7 +376,7 @@ export function ProfileSettings() {
       </Section>
 
       <Section icon={KeyRound} title="Password" description="Choose a strong password you do not use elsewhere.">
-        <PasswordForm />
+        <PasswordForm userId={user.id} />
       </Section>
 
       <section className="flex flex-col gap-4 rounded-2xl border border-rose-500/20 bg-rose-500/[0.03] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">

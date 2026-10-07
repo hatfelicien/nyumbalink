@@ -21,12 +21,13 @@ import { usersService } from '../../services/usersService'
 import type { User } from '../../types'
 import { formatDate } from '../../utils/format'
 
-const STATUS_VARIANT = { active: 'success', pending: 'pending', suspended: 'danger' } as const
+const STATUS_VARIANT = { active: 'success', pending: 'pending', suspended: 'danger', rejected: 'danger' } as const
 const STATUS_FILTERS = [
   { value: '', label: 'All statuses' },
   { value: 'active', label: 'Active' },
-  { value: 'pending', label: 'Pending' },
+  { value: 'pending', label: 'Awaiting approval' },
   { value: 'suspended', label: 'Suspended' },
+  { value: 'rejected', label: 'Rejected' },
 ]
 
 export function AdminOwnersPage() {
@@ -198,6 +199,7 @@ export function AdminOwnersPage() {
         </div>
         <Button
           icon={<Plus className="h-4 w-4" />}
+          className="w-full sm:w-auto"
           onClick={() => {
             setEditingOwner(null)
             setFormOpen(true)

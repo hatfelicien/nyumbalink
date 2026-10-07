@@ -115,6 +115,16 @@ Every list has a loading skeleton, an empty state, and an error state with retry
   bar until the contact card scrolls into view
 - Framer Motion animations follow the operating system's reduced-motion setting
 
+**Landlord sign-up and approval**
+- Landlords register at **/become-an-owner** (also linked from Sign up and Log in) with their name,
+  email, Rwandan phone number, national ID, where their property is, how many they manage, and a
+  password. This creates their account in a locked "pending" state
+- Pending landlords cannot log in; the login page tells them their application is waiting for review
+- Admins review applications under **Admin → Landlord applications**. Approving switches the account
+  on so the landlord can log in with the password they chose; rejecting requires a reason, which the
+  applicant sees when they try to log in
+- Tenants still sign up and use their account straight away
+
 **Account**
 - Your avatar opens an account menu (profile, dashboard or My rentals, messages, log out) on every
   page and screen size; logging out confirms with a message and returns to the home page
@@ -193,8 +203,12 @@ No component or page imports `src/data/` directly, so this is the only layer tha
   the in-app inbox is delivered. There is a web app manifest but no service worker, so no offline
   support or background push yet.
 - Signing an agreement records a typed name and timestamp; it is not a certified e-signature.
-- Changing your password validates the form but stores nothing, because there is no real
-  authentication yet (any password logs in).
+- Passwords: accounts registered in this browser must log in with the password they chose, and can
+  change it on the profile page. The seeded demo accounts still accept any password. This is a
+  stand-in for real authentication — passwords are hashed into localStorage only so the flow behaves
+  realistically, which is not secure. A real backend must check passwords on the server.
+- Registered accounts and landlord applications are saved in this browser, so the apply-then-approve
+  flow survives a reload, but they are not shared between browsers or devices until there is a backend.
 - Only the most visible public screens are translated. Dashboards are English, and the Kinyarwanda
   and French strings should be reviewed by native speakers before launch.
 - Rent collection, receipts and rent reminders are not built (only the existing mobile-money

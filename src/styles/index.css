@@ -43,6 +43,13 @@
   p {
     @apply leading-relaxed;
   }
+
+  /* Grid items default to min-width: auto, so one long unbroken line (an email, a title
+     with nowrap) can push a card wider than a small phone and get clipped. Let them shrink;
+     an explicit min-w-* utility still wins because utilities come after base styles. */
+  .grid > * {
+    min-width: 0;
+  }
 }
 
 @layer components {
